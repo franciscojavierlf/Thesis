@@ -1,0 +1,75 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Project title: Red Prueba
+# File name: crypto-config.yaml
+# File creation date: February 27, 2021
+# Last modification date: February 27, 2021
+# Modification done by: AFMH
+# 
+
+# ---------------------------------------------------------------------------
+# "OrdererOrgs" - Definition of organizations managing orderer nodes
+# ---------------------------------------------------------------------------
+OrdererOrgs:
+  # ---------------------------------------------------------------------------
+  # Orderer
+  # ---------------------------------------------------------------------------
+  - Name: Orderer
+    Domain: ciencia.edu
+    EnableNodeOUs: true
+    # ---------------------------------------------------------------------------
+    # "Specs"
+    # ---------------------------------------------------------------------------
+    Specs:
+      - Hostname: orderer
+
+# ---------------------------------------------------------------------------
+# "PeerOrgs" - Definition of organizations managing peer nodes
+# ---------------------------------------------------------------------------
+PeerOrgs:
+  # ---------------------------------------------------------------------------
+  # Org1 - Gobierno - government
+  # ---------------------------------------------------------------------------
+  - Name: Org1
+    Domain: department1.university1.edu
+    EnableNodeOUs: true
+    # ---------------------------------------------------------------------------
+    # "Specs"
+    Template:
+      Count: 1 # Numero de peers
+    # ---------------------------------------------------------------------------
+    # "Users"
+    # ---------------------------------------------------------------------------
+    # Count: The number of user accounts _in addition_ to Admin
+    # ---------------------------------------------------------------------------
+    Users:
+      Count: 1
+    Specs:
+      - Hostname: peer0
+        CommonName: peer0.department1.university1.edu # overrides Hostname-based FQDN set above
+        SANS:
+          - "localhost"
+
+  # ---------------------------------------------------------------------------
+  # Org2 - Analistas de Riesgos - risk analysts
+  # ---------------------------------------------------------------------------
+  - Name: Org2
+    Domain: department2.university2.edu
+    EnableNodeOUs: true
+    Template:
+      Count: 1 # Numero de peers
+    Users:
+      Count: 1
+  # ---------------------------------------------------------------------------
+  # Org3 - Instaladores - installers
+  # ---------------------------------------------------------------------------
+  - Name: Org3
+    Domain: department3.university3.edu
+    EnableNodeOUs: true
+    Template:
+      Count: 1 # Numero de peers
+    Users:
+      Count: 1
+

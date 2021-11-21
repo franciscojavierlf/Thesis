@@ -1,0 +1,91 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+# Project title: Red Prueba
+# File name: crypto-config.yaml
+# File creation date: February 27, 2021
+# Last modification date: February 27, 2021
+# Modification done by: AFMH
+# 
+
+version: '2'
+
+volumes:
+  orderer.ciencia.edu:
+  peer0.department1.university1.edu:
+  peer0.department2.university2.edu:
+  peer0.department3.university3.edu:
+
+networks:
+  byfn:
+
+services:
+
+  orderer.ciencia.edu:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.ciencia.edu
+    container_name: orderer.ciencia.edu
+    networks:
+      - byfn
+
+  peer0.department1.university1.edu:
+    container_name: peer0.department1.university1.edu
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.department1.university1.edu
+    networks:
+      - byfn
+
+  peer0.department2.university2.edu:
+    container_name: peer0.department2.university2.edu
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.department2.university2.edu
+    networks:
+      - byfn
+
+  peer0.department3.university3.edu:
+    container_name: peer0.department3.university3.edu
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.department3.university3.edu
+    networks:
+      - byfn
+      
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    stdin_open: true
+    environment:
+      - SYS_CHANNEL=$SYS_CHANNEL
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      #- FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_LOGGING_SPEC=ERROR
+      - CORE_PEER_ID=cli
+      - CORE_PEER_ADDRESS=peer0.department1.university1.edu:5051
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/users/Admin@department1.university1.edu/msp
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/hyperledger/fabric-samples/chaincode
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+        - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+    depends_on:
+      - orderer.ciencia.edu
+      - peer0.department1.university1.edu
+      - peer0.department2.university2.edu
+      - peer0.department3.university3.edu
+    networks:
+      - byfn
