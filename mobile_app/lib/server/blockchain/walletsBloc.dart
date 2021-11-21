@@ -6,7 +6,7 @@ import 'package:ecotoken/server/database/profilesBloc.dart';
 
 class WalletsBloc {
   static final _db = FirebaseFirestore.instance;
-
+  
   static Future<Wallet> getWallet(String walletId) async {
     // FOR NOW, IT REACHES FIREBASE. IT SHOULD REACH THE BLOCKCHAIN.
     final snapshot = await _db.collection('wallets').doc(walletId).get();
@@ -57,9 +57,6 @@ class WalletsBloc {
     return Wallet(
       owner: owner,
       tokens: map['tokens']?.toDouble() ?? 0.0,
-      preferredTransport: Transport.values.firstWhere(
-          (e) => e.toString() == map['preferredTransport'],
-          orElse: () => Transport.Walking),
       carbonSaved: carbonSaved,
       carbonEmitted: carbonEmitted,
       distanceTravelled: distanceTravelled,

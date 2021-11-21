@@ -19,11 +19,11 @@ class MainController extends GetxController {
       if (user != null)
         ProfilesBloc.getProfile(user.uid).then((value) {
           rxProfile(value);
-          Get.off(HubView());
+          Get.offAll(HubView(0));
         }).catchError((err) {
           print(err);
         });
-      else Get.off(LoginView());
+      else Get.offAll(LoginView());
     });
   }
 }

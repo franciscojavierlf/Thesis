@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecotoken/logic/profile.dart';
 import 'package:ecotoken/logic/trajectory.dart';
+import 'package:ecotoken/server/blockchain/walletsBloc.dart';
 import 'package:ecotoken/server/database/profilesBloc.dart';
 import 'package:ecotoken/utils/extensions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,24 +9,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 abstract class TrajectoriesBloc {
   static final _db = FirebaseFirestore.instance;
 
-  static Future<void> addTrajectory({
+  static Trajectory generateTrajectory({
     required Profile owner,
     required Duration duration,
     required List<GeoPoint> path,
     required Transport transport,
-  }) async {
+  }) {
     // FOR NOW, IT IS ADDED TO FIREBASE
     // THIS IS WRONG SINCE MANY VARIABLES ARE CALCULATED BY THE SMART CONTRACT
-    if (transport == Transport.Car)
-      throw 'Cannot add a trajectory with a car!';
-    if (path.length < 2)
-      throw 'Path must contain at least two points!';
+    if (transport == Transport.Car) throw 'Cannot add a trajectory with a car!';
+    if (path.length < 2) throw 'Path must contain at least two points!';
 
     DateTime finish = DateTime.now();
     double distance = 0;
     for (int i = 1; i < path.length; i++)
       distance += path[i - 1].distance(path[i]);
-      
+
     double carbonEmitted = distance / duration.inMilliseconds * 1000;
     double carbonSaved = distance / duration.inMilliseconds * 1000;
     switch (transport) {
@@ -54,22 +53,38 @@ abstract class TrajectoriesBloc {
 
     final tokens = carbonSaved - carbonEmitted;
 
-    await _db.collection('trajectories').add(
-          _trajectoryToMap(
-            Trajectory(
-              id: '',
-              carbonEmitted: carbonEmitted,
-              carbonSaved: carbonSaved,
-              distance: distance,
-              duration: duration,
-              finish: finish,
-              owner: owner,
-              path: path,
-              tokens: tokens,
-              transport: transport,
-            ),
+    // Creates the trajectory and adds
+    return Trajectory(
+      id: '',
+      carbonEmitted: carbonEmitted,
+      carbonSaved: carbonSaved,
+      distance: distance,
+      duration: duration,
+      finish: finish,
+      owner: owner,
+      path: path,
+      tokens: tokens,
+      transport: transport,
+    );
+  }
+
+  static Future<Trajectory> addTrajectory(Trajectory trajectory) async {
+
+    final res = await Future.wait<dynamic>([
+      _db.collection('trajectories').add(
+            _trajectoryToMap(trajectory),
           ),
-        );
+      _db.collection('wallets').doc(trajectory.owner.wallet).update({
+        'tokens': FieldValue.increment(trajectory.tokens),
+        'totalCarbonSaved': FieldValue.increment(trajectory.carbonSaved),
+        'totalCarbonEmitted': FieldValue.increment(trajectory.carbonEmitted),
+        'totalDistanceTravelled': FieldValue.increment(trajectory.distance),
+        'totalTimeTravelled': FieldValue.increment(trajectory.duration.inMilliseconds),
+      }),
+    ]);
+    trajectory.id = res[0].id;
+
+    return trajectory;
   }
 
   static Future<List<Trajectory>> getTrajectories({Profile? owner}) async {
@@ -82,7 +97,7 @@ abstract class TrajectoriesBloc {
 
     // Gets all trajectories
     if (owner == null) {
-      snapshot = await query.get();
+      snapshot = await query.orderBy('finish', descending: true).get();
 
       // Gets profiles
       final futureProfiles = snapshot.docs
@@ -93,7 +108,7 @@ abstract class TrajectoriesBloc {
     }
     // Gets of only one owner
     else {
-      snapshot = await query.where('owner', isEqualTo: owner.id).get();
+      snapshot = await query.where('owner', isEqualTo: owner.id).orderBy('finish', descending: true).get();
       profiles[owner.id] = owner;
     }
 

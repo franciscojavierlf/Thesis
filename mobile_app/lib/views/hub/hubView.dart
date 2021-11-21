@@ -8,13 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// The view that contains all the main views.
-class HubView extends StatelessWidget {
-  final controller = Get.put(HubController());
+class HubView extends GetView<HubController> {
+  HubView(int? selectedIndex) {
+    Get.put(HubController(selectedIndex));
+  }
 
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
-  static final List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = [
     HomeView(),
     TrajectoriesView(),
     SocialView(),

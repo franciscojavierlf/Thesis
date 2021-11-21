@@ -7,7 +7,7 @@ enum Transport {
 }
 
 class Trajectory {
-  final String id;
+  String id;
   final DateTime finish;
   final double tokens;
   final double carbonEmitted;

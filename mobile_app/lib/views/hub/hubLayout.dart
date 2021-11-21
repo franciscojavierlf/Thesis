@@ -4,21 +4,25 @@ import 'package:get/get_utils/src/extensions/widget_extensions.dart';
 
 class HubLayout extends StatelessWidget {
   final Widget body;
+  final bool scroll;
 
   HubLayout({
     required this.body,
+    this.scroll = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final child = scroll
+        ? SingleChildScrollView(
+            child: body.paddingAll(25),
+          )
+        : body.paddingAll(25);
+
     return Scaffold(
       backgroundColor: Palette.lightBgColor,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
-            child: body.paddingAll(25),
-          ),
-        ),
+        child: child,
       ),
     );
   }

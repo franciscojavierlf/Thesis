@@ -8,9 +8,8 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 /// A trajectory running.
 class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
-  final Transport transport;
 
-  CurrentTrajectoryView(this.transport) {
+  CurrentTrajectoryView(Transport transport) {
     Get.put(CurrentTrajectoryController(transport));
   }
 
@@ -126,7 +125,7 @@ class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: -10,
                     children: [
-                      TransportIcon(transport, color: Colors.white, size: 75),
+                      TransportIcon(controller.transport, color: Colors.white, size: 75),
                       _specialText('Transporte', size: 18.px),
                     ],
                   ).centered,

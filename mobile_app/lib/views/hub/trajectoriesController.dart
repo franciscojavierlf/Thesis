@@ -12,7 +12,10 @@ class TrajectoriesController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Loads trajectories
+    loadTrajectories();
+  }
+
+  void loadTrajectories() {
     TrajectoriesBloc.getTrajectories(owner: mainController.profile!)
         .then((value) => trajectories(value));
   }

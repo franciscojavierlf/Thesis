@@ -34,7 +34,7 @@ class CurrentTrajectoryController extends GetxController {
           path.add(GeoPoint(position.latitude, position.longitude)));
       stopwatch.onExecute.add(StopWatchExecute.start);
     }).catchError((err) {
-      Get.off(HubView());
+      Get.offAll(HubView(0));
     });
   }
 
@@ -69,7 +69,7 @@ class CurrentTrajectoryController extends GetxController {
           ),
           TextButton(
             child: Text('Descartar'),
-            onPressed: () => Get.off(HubView()),
+            onPressed: () => Get.off(HubView(0)),
           ),
           TextButton(
             child: Text('Cancelar'),
@@ -86,16 +86,16 @@ class CurrentTrajectoryController extends GetxController {
   void finishTrajectory() async {
     // Saves trajectory
     try {
-      await TrajectoriesBloc.addTrajectory(
+      final trajectory = TrajectoriesBloc.generateTrajectory(
         owner: mainController.profile!,
         duration: Duration(milliseconds: duration),
         path: path,
         transport: transport,
       );
-      Get.off(TrajectoryView.finished());
+      Get.offAll(TrajectoryView.finished(trajectory));
     } catch (ex) {
       print(ex);
-      Get.off(HubView());
+      Get.offAll(HubView(0));
     }
   }
 }

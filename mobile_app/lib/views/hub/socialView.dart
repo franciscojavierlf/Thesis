@@ -84,7 +84,7 @@ class SocialView extends StatelessWidget {
                         ).paddingAll(10),
                       );
                     },
-                    separatorBuilder: (context, index) => SizedBox(height: 25),
+                    separatorBuilder: (context, index) => SizedBox(height: 10),
                     itemCount: controller.wallets.value!.length,
                   ),
           ),

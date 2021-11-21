@@ -20,9 +20,6 @@ class Wallet {
   /// Total distance travelled.
   final Map<Transport, double> distanceTravelled;
 
-  /// The preferred transport of the user.
-  final Transport preferredTransport;
-
   final double totalDistanceTravelled;
   final double totalCarbonSaved;
   final double totalCarbonEmitted;
@@ -36,10 +33,22 @@ class Wallet {
     required this.carbonSaved,
     required this.timeTravelled,
     required this.distanceTravelled,
-    required this.preferredTransport,
     required this.totalCarbonEmitted,
     required this.totalCarbonSaved,
     required this.totalDistanceTravelled,
     required this.totalTimeTravelled,
   });
+
+  /// The transport that the user has taken the most time with.
+  Transport get preferredTransport {
+    Transport best = Transport.Walking;
+    int maxDuration = 0;
+    timeTravelled.forEach((key, value) {
+      if (value.inMilliseconds > maxDuration) {
+        maxDuration = value.inMilliseconds;
+        best = key;
+      }
+    });
+    return best;
+  }
 }

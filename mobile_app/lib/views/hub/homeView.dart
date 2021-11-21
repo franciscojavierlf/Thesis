@@ -6,6 +6,7 @@ import 'package:ecotoken/views/hub/homeController.dart';
 import 'package:ecotoken/views/mainController.dart';
 import 'package:ecotoken/widgets/splashScreen.dart';
 import 'package:ecotoken/widgets/transportIcon.dart';
+import 'package:ecotoken/widgets/transportsTable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -25,8 +26,8 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-    final leftColumnPadding = 20.0;
-    final rightColumnPadding = 30.0;
+
+    controller.loadWallet();
 
     return WillPopScope(
       onWillPop: () async {
@@ -174,100 +175,12 @@ class HomeView extends StatelessWidget {
                             // Carbon impact
                             EcoText.h3('Tu impacto de carbono').centered,
                             SizedBox(height: 15),
-                            Table(
-                              children: [
-                                TableRow(
-                                  children: [
-                                    TableCell(
-                                        child: EcoText.pIcon(
-                                                'Motocicleta',
-                                                TransportIcon(
-                                                    Transport.Motorcycle,
-                                                    size: 16),
-                                                end: true)
-                                            .align(Alignment.centerRight)
-                                            .paddingOnly(
-                                                right: leftColumnPadding)),
-                                    TableCell(
-                                        child: EcoText.p(
-                                                '${controller.carbonImpact(Transport.Motorcycle).toStringAsFixed(2)}kg')
-                                            .paddingOnly(
-                                                left: rightColumnPadding)),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    TableCell(
-                                        child: EcoText.pIcon(
-                                                'Metro',
-                                                TransportIcon(Transport.Metro,
-                                                    size: 16),
-                                                end: true)
-                                            .align(Alignment.centerRight)
-                                            .paddingOnly(
-                                                right: leftColumnPadding)),
-                                    TableCell(
-                                        child: EcoText.p(
-                                                '${controller.carbonImpact(Transport.Metro).toStringAsFixed(2)}kg')
-                                            .paddingOnly(
-                                                left: rightColumnPadding)),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    TableCell(
-                                        child: EcoText.pIcon(
-                                                'Autobús',
-                                                TransportIcon(Transport.Bus,
-                                                    size: 16),
-                                                end: true)
-                                            .align(Alignment.centerRight)
-                                            .paddingOnly(
-                                                right: leftColumnPadding)),
-                                    TableCell(
-                                        child: EcoText.p(
-                                                '${controller.carbonImpact(Transport.Bus).toStringAsFixed(2)}kg')
-                                            .paddingOnly(
-                                                left: rightColumnPadding)),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    TableCell(
-                                        child: EcoText.pIcon(
-                                                'Caminata',
-                                                TransportIcon(Transport.Walking,
-                                                    size: 16),
-                                                end: true)
-                                            .align(Alignment.centerRight)
-                                            .paddingOnly(
-                                                right: leftColumnPadding)),
-                                    TableCell(
-                                        child: EcoText.p(
-                                                '${controller.carbonImpact(Transport.Walking).toStringAsFixed(2)}kg')
-                                            .paddingOnly(
-                                                left: rightColumnPadding)),
-                                  ],
-                                ),
-                                TableRow(
-                                  children: [
-                                    TableCell(
-                                        child: EcoText.pIcon(
-                                                'Bicicleta',
-                                                TransportIcon(Transport.Bicycle,
-                                                    size: 16),
-                                                end: true)
-                                            .align(Alignment.centerRight)
-                                            .paddingOnly(
-                                                right: leftColumnPadding)),
-                                    TableCell(
-                                        child: EcoText.p(
-                                                '${controller.carbonImpact(Transport.Bicycle).toStringAsFixed(2)}kg')
-                                            .paddingOnly(
-                                                left: rightColumnPadding)),
-                                  ],
-                                ),
-                              ],
+                            TransportsTable(
+                              motorcycle: controller.carbonImpact(Transport.Motorcycle),
+                              metro: controller.carbonImpact(Transport.Metro),
+                              bus: controller.carbonImpact(Transport.Bus),
+                              walking: controller.carbonImpact(Transport.Walking),
+                              bicycle: controller.carbonImpact(Transport.Bicycle),
                             ).centered,
                           ],
                         ),
