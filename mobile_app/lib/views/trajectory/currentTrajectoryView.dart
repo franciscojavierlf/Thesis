@@ -7,10 +7,11 @@ import 'package:get/get.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 /// A trajectory running.
-class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
+class CurrentTrajectoryView extends StatelessWidget {
+  final controller = Get.put(CurrentTrajectoryController());
 
   CurrentTrajectoryView(Transport transport) {
-    Get.put(CurrentTrajectoryController(transport));
+    controller.start(transport);
   }
 
   static const borderColor = Color(0xff797659);
@@ -80,9 +81,10 @@ class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
                         bool hours = false;
                         if (controller.duration / 6000000 > 1) hours = true;
                         final displayTime = StopWatchTimer.getDisplayTime(
-                            controller.duration,
-                            milliSecond: false,
-                            hours: hours);
+                          controller.duration,
+                          milliSecond: false,
+                          hours: hours,
+                        );
                         return _specialText(displayTime,
                             size: 46.px, bold: true);
                       }),
@@ -103,7 +105,10 @@ class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: -25,
                 children: [
-                  _specialText('1.2', size: 80.px, bold: true),
+                  Obx(() => _specialText(
+                      controller.distance.value.toStringAsFixed(2),
+                      size: 80.px,
+                      bold: true)),
                   _specialText('Kilómetros', size: 20.px),
                 ],
               ).centered,
@@ -125,7 +130,8 @@ class CurrentTrajectoryView extends GetView<CurrentTrajectoryController> {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: -10,
                     children: [
-                      TransportIcon(controller.transport, color: Colors.white, size: 75),
+                      TransportIcon(controller.transport!,
+                          color: Colors.white, size: 75),
                       _specialText('Transporte', size: 18.px),
                     ],
                   ).centered,

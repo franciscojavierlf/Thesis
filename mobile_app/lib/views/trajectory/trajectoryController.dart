@@ -6,16 +6,13 @@ import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/state_manager.dart';
 
 class TrajectoryController extends GetxController {
-  final Trajectory trajectory;
-
-  TrajectoryController(this.trajectory);
-
+  Trajectory? trajectory;
   final loading = false.obs;
 
   void uploadTrajectory() async {
     loading(true);
     try {
-      await TrajectoriesBloc.addTrajectory(trajectory);
+      await TrajectoriesBloc.addTrajectory(trajectory!);
       loading(false);
     } catch (ex) {
       print('Error adding trajectory');

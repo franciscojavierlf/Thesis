@@ -24,6 +24,7 @@ class HomeController extends GetxController {
     try {
       wallet(await WalletsBloc.getWallet(mainController.profile!.wallet));
     } catch(ex) {
+      print(error);
       error(true);
     }
   }

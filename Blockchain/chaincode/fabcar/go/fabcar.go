@@ -1,6 +1,5 @@
 /*
 SPDX-License-Identifier: Apache-2.0
-
 */
 
 package main
@@ -10,11 +9,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"errors"
-	"bytes"
-	"time"
-
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"	
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 // SmartContract provides functions for managing a car
@@ -139,79 +134,6 @@ func (s *SmartContract) ChangeCarOwner(ctx contractapi.TransactionContextInterfa
 	carAsBytes, _ := json.Marshal(car)
 
 	return ctx.GetStub().PutState(carNumber, carAsBytes)
-}
-
-// GetHistoryCar gets the transaction history of a given car
-func (s *SmartContract) GetHistoryCar(ctx contractapi.TransactionContextInterface, key string) (string, error) {
-
-	existing, err := ctx.GetStub().GetState(key)
-
-	if err != nil {
-		return "", errors.New("Unable to interact with world state")
-	}
-
-	if existing == nil {
-		return "", fmt.Errorf("Cannot read world state with key %s. Does not exist", key)
-	}
-
-	stub := ctx.GetStub()
-
-	assetID := key
-
-	fmt.Printf("- start GetHistory Car: %s\n", assetID)
-
-	resultsIterator, err := stub.GetHistoryForKey(assetID)
-	if err != nil {
-		return "", errors.New("Unable to get history")
-	}
-	defer resultsIterator.Close()
-
-	// buffer is a JSON array containing historic values for the marble
-	var buffer bytes.Buffer
-	buffer.WriteString("[")
-
-	bArrayMemberAlreadyWritten := false
-	for resultsIterator.HasNext() {
-		response, err := resultsIterator.Next()
-		if err != nil {
-			return "", errors.New("Unable to get next element ") //(err.Error())
-		}
-		// Add a comma before array members, suppress it for the first array member
-		if bArrayMemberAlreadyWritten == true {
-			buffer.WriteString(",")
-		}
-		buffer.WriteString("{\"TxId\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(response.TxId)
-		buffer.WriteString("\"")
-
-		buffer.WriteString(", \"Value\":")
-		// if it was a delete operation on given key, then we need to set the
-		//corresponding value null. Else, we will write the response.Value
-		//as-is (as the Value itself a JSON marble)
-		if response.IsDelete {
-			buffer.WriteString("null")
-		} else {
-			buffer.WriteString(string(response.Value))
-		}
-
-		buffer.WriteString(", \"Timestamp\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(time.Unix(response.Timestamp.Seconds, int64(response.Timestamp.Nanos)).String())
-		buffer.WriteString("\"")
-
-		buffer.WriteString(", \"IsDelete\":")
-		buffer.WriteString("\"")
-		buffer.WriteString(strconv.FormatBool(response.IsDelete))
-		buffer.WriteString("\"")
-
-		buffer.WriteString("}")
-		bArrayMemberAlreadyWritten = true
-	}
-	buffer.WriteString("]")
-
-	fmt.Printf("- GetHistory Car returning:\n%s\n", buffer.String())
-	return buffer.String(), nil
 }
 
 func main() {

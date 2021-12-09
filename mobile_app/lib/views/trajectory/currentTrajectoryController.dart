@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecotoken/logic/trajectory.dart';
 import 'package:ecotoken/server/blockchain/trajectoriesBloc.dart';
+import 'package:ecotoken/utils/extensions.dart';
 import 'package:ecotoken/utils/gps.dart';
 import 'package:ecotoken/views/hub/hubView.dart';
 import 'package:ecotoken/views/mainController.dart';
@@ -16,33 +17,41 @@ import 'package:get/state_manager.dart';
 class CurrentTrajectoryController extends GetxController {
   final mainController = Get.find<MainController>();
 
-  final Transport transport;
+  Transport? transport;
 
-  final stopwatch = StopWatchTimer();
+  var stopwatch = StopWatchTimer();
   final paused = false.obs;
-  int duration = 0;
+  final distance = 0.0.obs;
+  int duration = 0; // Updated in the view
+  bool first = false;
   final List<GeoPoint> path = [];
   StreamSubscription<Position>? subscription;
-
-  CurrentTrajectoryController(this.transport);
-
-  @override
-  void onInit() {
-    super.onInit();
-    GPS.getPositionStream().then((stream) {
-      subscription = stream.listen((position) =>
-          path.add(GeoPoint(position.latitude, position.longitude)));
-      stopwatch.onExecute.add(StopWatchExecute.start);
-    }).catchError((err) {
-      Get.offAll(HubView(0));
-    });
-  }
 
   @override
   void onClose() {
     super.onClose();
     subscription?.cancel();
     stopwatch.dispose();
+  }
+
+  void start(Transport transport) {
+    this.transport = transport;
+    stopwatch = StopWatchTimer();
+    path.clear();
+    GPS.getPositionStream().then((stream) {
+      subscription = stream.listen((position) {
+        final point = GeoPoint(position.latitude, position.longitude);
+        if (!first)
+          first = true;
+        else
+          distance(distance.value + path.last.distance(point));
+        path.add(point);
+      });
+      stopwatch.onExecute.add(StopWatchExecute.start);
+    }).catchError((err) {
+      Get.offAll(HubView(0));
+    });
+    first = false;
   }
 
   void pause() {
@@ -90,7 +99,7 @@ class CurrentTrajectoryController extends GetxController {
         owner: mainController.profile!,
         duration: Duration(milliseconds: duration),
         path: path,
-        transport: transport,
+        transport: transport!,
       );
       Get.offAll(TrajectoryView.finished(trajectory));
     } catch (ex) {

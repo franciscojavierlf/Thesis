@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"math"
 
 	"errors"
 	"bytes"
@@ -22,78 +23,232 @@ type SmartContract struct {
 	contractapi.Contract
 }
 
-// Describes a trajectory
-type Trajectory struct {
-	id 						string `json:"id"`
-	finish 				uint32 `json:"finish"`
-	tokens 				float32 `json:"tokens"`
-	carbonEmitted float32 `json:"carbonEmitted"`
-	carbonSaved 	float32 `json:"carbonSaved"`
-	distance 			float32 `json:"distance"`
-	duration 			uint32 `json:"duration"`
-	path 					[]uint32 `json:"path"`
-	transport 		string `json:"transport"`
-	owner 				string `json:"string"`
+// Enum of transport types
+const (
+	Motorcycle string = "Transport.Motorcycle"
+	Walking string		= "Transport.Walking"
+	Metro string			= "Transport.Metro"
+	Bus string				= "Transport.Bus"
+	Bicycle string		= "Transport.Bicycle"
+	Car string				= "Transport.Car"
+)
+
+// A list of all the possible transports
+func isTransportValid(transport string) bool {
+	switch transport {
+		case 
+			Motorcycle,
+			Walking,
+			Metro,
+			Bus,
+			Bicycle,
+			Car:
+				return true
+		}
+	return false
 }
 
-// QueryResult structure used for handling result of query
-type QueryResult struct {
-	Key    string `json:"Key"`
-	Record *Car
+// Describes a trajectory
+type Trajectory struct {
+	Id 						string `json:"Id"`
+	Finish 				uint32 `json:"Finish"`
+	Tokens 				float64 `json:"Tokens"`
+	CarbonEmitted float64 `json:"CarbonEmitted"`
+	CarbonSaved 	float64 `json:"CarbonSaved"`
+	Distance 			float64 `json:"Distance"`
+	Duration 			uint32 `json:"Duration"`
+	Path 					[][]float64 `json:"Path"`
+	Transport 		string `json:"Transport"`
+	Owner 				string `json:"Owner"`
+}
+
+type Wallet struct {
+	Id											string `json:"Id"`
+	Tokens 									float64 `json:"Tokens"`
+	CarbonEmitted 					map[string]float64 `json:"CarbonEmitted"`
+	CarbonSaved 						map[string]float64 `json:"CarbonSaved"`
+	TimeTravelled 					map[string]float64 `json:"TimeTravelled"`
+	DistanceTravelled 			map[string]float64 `json:"DistanceTravelled"`
+	TotalDistanceTravelled 	float64 `json:"TotalDistanceTravelled"`
+	TotalCarbonSaved 				float64 `json:"TotalCarbonSaved"`
+	TotalCarbonEmitted 			float64 `json:"TotalCarbonEmitted"`
+	TotalTimeTravelled 			uint32 `json:"TotalTimeTravelled"`
+}
+
+// Structure used for handling result of a wallet's query
+type WalletQueryResult struct {
+	Key     string `json:"Key"`
+	Record *Wallet
+}
+
+// Structure used for handling result of trajectory's query
+type TrajectoryQueryResult struct {
+	Key			string `json:"Key"`
+	Record *Trajectory	
 }
 
 // InitLedger adds a base set of cars to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
-	//cars := []Car{
-	//	Car{Make: "Toyota", Model: "Prius", Colour: "blue", Owner: "Tomoko"},
-	//}
 
-	//for i, car := range cars {
-	//	carAsBytes, _ := json.Marshal(car)
-	//	err := ctx.GetStub().PutState("CAR"+strconv.Itoa(i), carAsBytes)
+	wallets := []Wallet {
+		Wallet{
+			Id: "c0QOCSutCq82DfIyXBfj",
+			Tokens: 23.0,
+			CarbonEmitted: map[string]float64{
+				"Transport.Walking": 0.1,
+			},
+			CarbonSaved: map[string]float64{
+				"Transport.Walking": 2.3,
+			},
+			TimeTravelled: map[string]float64{
+				"Transport.Walking": 389000,
+			},
+			DistanceTravelled: map[string]float64{
+				"Transport.Walking": 0.8,
+			},
+			TotalDistanceTravelled: 0.916,
+			TotalCarbonSaved: 2.31,
+			TotalCarbonEmitted: 0.11,
+			TotalTimeTravelled: 485243,
+		},
+	}
 
-	//	if err != nil {
-	//		return fmt.Errorf("Failed to put to world state. %s", err.Error())
-	//	}
-	//}
+	for _, wallet := range wallets {
+		walletAsBytes, _ := json.Marshal(wallet)
+		err := ctx.GetStub().PutState(wallet.Id, walletAsBytes)
+
+		if err != nil {
+			return fmt.Errorf("Failed to put to world state. %s", err.Error())
+		}
+	}
 
 	return nil
 }
 
-// CreateCar adds a new car to the world state with given details
-func (s *SmartContract) CreateCar(ctx contractapi.TransactionContextInterface, carNumber string, make string, model string, colour string, owner string) error {
-	car := Car{
-		Make:   make,
-		Model:  model,
-		Colour: colour,
-		Owner:  owner,
+func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterface, id string, walletId string, owner string, duration uint32, finish uint32, path [][]float64, transport string) error {
+	// Logic behind the incentive
+	if transport == "Transport.Car" {
+		return errors.New("Cannot add a trajectory with a car!")
+	}
+	if !isTransportValid(transport) {
+		return errors.New("Transport is not valid: " + transport)
+	}
+	if len(path) < 2 {
+		return errors.New("Path must contain at least two points!")
 	}
 
-	carAsBytes, _ := json.Marshal(car)
+	// Calculates distance between two geopoints
+	getDistance := func(p1 []float64, p2 []float64) float64 {
+		lat1 := p1[0]; lat2 := p2[0];
+		lon1 := p1[1]; lon2 := p2[1];
+		return 6371 * 2 * math.Asin(math.Sqrt(math.Pow(math.Sin((lat2 - lat1) * 0.5), 2) + math.Cos(lat1) * math.Cos(lat2) * math.Pow(math.Sin((lon2 - lon1) * 0.5), 2)))
+	}
 
-	return ctx.GetStub().PutState(carNumber, carAsBytes)
+	// Gets total distance
+	var distance float64 = 0.0
+	for i := 1; i < len(path); i++ {
+		distance += getDistance(path[i - 1], path[i])
+	}
+
+	// Calculates important data
+	carbonEmitted := distance / float64(duration) * 1000
+	carbonSaved := distance / float64(duration) * 1000
+	switch transport {
+		case Motorcycle:
+			carbonEmitted *= 0.4
+			carbonSaved *= 0.4
+		case Metro:
+			carbonEmitted *= 1.1
+			carbonSaved *= 1.1
+		case Bus:
+			carbonEmitted *= 0.9
+			carbonSaved *= 0.9
+		case Walking, Bicycle:
+			carbonEmitted *= 1.7
+			carbonSaved *= 1.7
+	}
+
+	// Calculates the tokens that are going to be given
+	tokens := carbonSaved - carbonEmitted
+
+	// Creates the trajectory
+	trajectory := Trajectory{
+		Finish: finish,
+		Tokens: tokens,
+		CarbonEmitted: carbonEmitted,
+		CarbonSaved: carbonSaved,
+		Distance: distance,
+		Duration: duration,
+		Path: path,
+		Transport: transport,
+		Owner: owner,
+	}
+
+	trajectoryAsBytes, _ := json.Marshal(trajectory)
+
+	////////// FALTA PONER ID
+	ctx.GetStub().PutState(id, trajectoryAsBytes)
+
+	// After adding trajectory, we add the update into the wallet
+	wallet, err := s.QueryWallet(ctx, walletId)
+	if err != nil {
+		return err
+	}
+
+	wallet.Tokens += tokens
+	wallet.TotalCarbonSaved += carbonSaved
+	wallet.TotalCarbonEmitted += carbonEmitted
+	wallet.TotalDistanceTravelled += distance
+	wallet.TotalTimeTravelled += duration
+
+	walletAsBytes, _ := json.Marshal(wallet)
+	return ctx.GetStub().PutState(walletId, walletAsBytes)
 }
 
-// QueryCar returns the car stored in the world state with given id
-func (s *SmartContract) QueryCar(ctx contractapi.TransactionContextInterface, carNumber string) (*Car, error) {
-	carAsBytes, err := ctx.GetStub().GetState(carNumber)
+func (s *SmartContract) AddEmptyWallet(ctx contractapi.TransactionContextInterface, id string) error {
+	
+	wallet := Wallet{
+		Id: "c0QOCSutCq82DfIyXBfj",
+		Tokens: 0.0,
+		CarbonEmitted: map[string]float64{},
+		CarbonSaved: map[string]float64{},
+		TimeTravelled: map[string]float64{},
+		DistanceTravelled: map[string]float64{},
+		TotalDistanceTravelled: 0.0,
+		TotalCarbonSaved: 0.0,
+		TotalCarbonEmitted: 0.0,
+		TotalTimeTravelled: 0,
+	}
+
+	walletAsBytes, _ := json.Marshal(wallet)
+	err := ctx.GetStub().PutState(wallet.Id, walletAsBytes)
+
+	if err != nil {
+		return fmt.Errorf("Failed to put to world state. %s", err.Error())
+	}
+	return nil
+}
+
+// Returns a wallet.
+func (s *SmartContract) QueryWallet(ctx contractapi.TransactionContextInterface, walletId string) (*Wallet, error) {
+	walletAsBytes, err := ctx.GetStub().GetState(walletId)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read from world state. %s", err.Error())
 	}
 
-	if carAsBytes == nil {
-		return nil, fmt.Errorf("%s does not exist", carNumber)
+	if walletAsBytes == nil {
+		return nil, fmt.Errorf("%s does not exist", walletId)
 	}
 
-	car := new(Car)
-	_ = json.Unmarshal(carAsBytes, car)
+	wallet := new(Wallet)
+	_ = json.Unmarshal(walletAsBytes, wallet)
 
-	return car, nil
+	return wallet, nil
 }
 
-// QueryAllCars returns all cars found in world state
-func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface) ([]QueryResult, error) {
+// Returns all wallets found in world state.
+func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterface) ([]WalletQueryResult, error) {
 	startKey := ""
 	endKey := ""
 
@@ -104,7 +259,7 @@ func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface
 	}
 	defer resultsIterator.Close()
 
-	results := []QueryResult{}
+	results := []WalletQueryResult{}
 
 	for resultsIterator.HasNext() {
 		queryResponse, err := resultsIterator.Next()
@@ -113,33 +268,18 @@ func (s *SmartContract) QueryAllCars(ctx contractapi.TransactionContextInterface
 			return nil, err
 		}
 
-		car := new(Car)
-		_ = json.Unmarshal(queryResponse.Value, car)
+		wallet := new(Wallet)
+		_ = json.Unmarshal(queryResponse.Value, wallet)
 
-		queryResult := QueryResult{Key: queryResponse.Key, Record: car}
+		queryResult := WalletQueryResult{Key: queryResponse.Key, Record: wallet}
 		results = append(results, queryResult)
 	}
 
 	return results, nil
 }
 
-// ChangeCarOwner updates the owner field of car with given id in world state
-func (s *SmartContract) ChangeCarOwner(ctx contractapi.TransactionContextInterface, carNumber string, newOwner string) error {
-	car, err := s.QueryCar(ctx, carNumber)
-
-	if err != nil {
-		return err
-	}
-
-	car.Owner = newOwner
-
-	carAsBytes, _ := json.Marshal(car)
-
-	return ctx.GetStub().PutState(carNumber, carAsBytes)
-}
-
 // GetHistoryCar gets the transaction history of a given car
-func (s *SmartContract) GetHistoryCar(ctx contractapi.TransactionContextInterface, key string) (string, error) {
+func (s *SmartContract) GetHistory(ctx contractapi.TransactionContextInterface, key string) (string, error) {
 
 	existing, err := ctx.GetStub().GetState(key)
 
@@ -207,7 +347,7 @@ func (s *SmartContract) GetHistoryCar(ctx contractapi.TransactionContextInterfac
 	}
 	buffer.WriteString("]")
 
-	fmt.Printf("- GetHistory Car returning:\n%s\n", buffer.String())
+	fmt.Printf("- GetHistory returning:\n%s\n", buffer.String())
 	return buffer.String(), nil
 }
 
@@ -216,11 +356,11 @@ func main() {
 	chaincode, err := contractapi.NewChaincode(new(SmartContract))
 
 	if err != nil {
-		fmt.Printf("Error create fabcar chaincode: %s", err.Error())
+		fmt.Printf("Error create ecotoken chaincode: %s", err.Error())
 		return
 	}
 
 	if err := chaincode.Start(); err != nil {
-		fmt.Printf("Error starting fabcar chaincode: %s", err.Error())
+		fmt.Printf("Error starting ecotoken chaincode: %s", err.Error())
 	}
 }

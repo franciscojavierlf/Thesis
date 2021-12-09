@@ -40,6 +40,6 @@ static Future<Stream<Position>> getPositionStream() async {
 
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
-  return Geolocator.getPositionStream();
+  return Geolocator.getPositionStream(intervalDuration: Duration(seconds: 15));
 }
 }

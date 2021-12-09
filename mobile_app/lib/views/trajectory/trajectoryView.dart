@@ -10,15 +10,16 @@ import 'package:ecotoken/widgets/transportIcon.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class TrajectoryView extends GetView<TrajectoryController> {
+class TrajectoryView extends StatelessWidget {
+  final controller = Get.put(TrajectoryController());
   final bool finished;
 
   TrajectoryView(Trajectory trajectory) : finished = false {
-    Get.put(TrajectoryController(trajectory));
+    controller.trajectory = trajectory;
   }
 
   TrajectoryView.finished(Trajectory trajectory) : finished = true {
-    Get.put(TrajectoryController(trajectory));
+    controller.trajectory = trajectory;
   }
 
   @override
@@ -30,9 +31,9 @@ class TrajectoryView extends GetView<TrajectoryController> {
       body: Column(
         children: [
           ListTile(
-            leading: TransportIcon(controller.trajectory.transport, size: 50),
+            leading: TransportIcon(controller.trajectory!.transport, size: 50),
             title: EcoText.h3(finished ? 'Recorrido terminado' : 'Recorrido'),
-            subtitle: EcoText.p(controller.trajectory.finish.niceString),
+            subtitle: EcoText.p(controller.trajectory!.finish.niceString),
           ),
           SizedBox(height: 20),
           // Info
@@ -43,7 +44,7 @@ class TrajectoryView extends GetView<TrajectoryController> {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(controller.trajectory.distance.toStringAsFixed(2)),
+                  EcoText.h2(controller.trajectory!.distance.toStringAsFixed(2)),
                   EcoText.p('km'),
                 ],
               ),
@@ -51,7 +52,7 @@ class TrajectoryView extends GetView<TrajectoryController> {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(controller.trajectory.duration.niceString),
+                  EcoText.h2(controller.trajectory!.duration.niceString),
                   EcoText.p('tiempo'),
                 ],
               ),
@@ -60,7 +61,7 @@ class TrajectoryView extends GetView<TrajectoryController> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   EcoText.h2(
-                      controller.trajectory.carbonEmitted.toStringAsFixed(2)),
+                      controller.trajectory!.carbonEmitted.toStringAsFixed(2)),
                   EcoText.p(CO2),
                 ],
               ),
@@ -90,14 +91,14 @@ class TrajectoryView extends GetView<TrajectoryController> {
             children: [
               TransportIcon(Transport.Car),
               EcoText.p(
-                  '${controller.trajectory.carbonSaved.toStringAsFixed(2)}kg'),
+                  '${controller.trajectory!.carbonSaved.toStringAsFixed(2)}kg'),
             ],
           ).expanded,
 
           // Bottom
           EcoText.p(finished ? 'Has generado' : 'Generaste').centered,
           SizedBox(height: 10),
-          EcoText.pIcon(controller.trajectory.tokens.toStringAsFixed(8),
+          EcoText.pIcon(controller.trajectory!.tokens.toStringAsFixed(8),
               Image.asset('assets/images/logo.png', width: 30)),
           SizedBox(height: 25),
           if (finished)

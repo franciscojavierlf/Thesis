@@ -42,15 +42,15 @@ class WalletsBloc {
         carbonEmitted = {},
         distanceTravelled = {};
     final Map<Transport, Duration> timeTravelled = {};
-    map['carbonSaved'].forEach((key, value) =>
+    (map['carbonSaved'] ?? {}).forEach((key, value) =>
         carbonSaved[Transport.values.firstWhere((e) => e.toString() == key)] =
             value);
-    map['carbonEmitted'].forEach((key, value) =>
+    (map['carbonEmitted'] ?? {}).forEach((key, value) =>
         carbonEmitted[Transport.values.firstWhere((e) => e.toString() == key)] =
             value);
-    map['distanceTravelled'].forEach((key, value) => distanceTravelled[
+    (map['distanceTravelled'] ?? {}).forEach((key, value) => distanceTravelled[
         Transport.values.firstWhere((e) => e.toString() == key)] = value);
-    map['timeTravelled'].forEach((key, value) =>
+    (map['timeTravelled'] ?? {}).forEach((key, value) =>
         timeTravelled[Transport.values.firstWhere((e) => e.toString() == key)] =
             Duration(seconds: value));
 

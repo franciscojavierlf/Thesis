@@ -43,10 +43,10 @@ class LoginController extends GetxController {
         message.value = '¡Inicio de sesión logrado!';
         loading(false);
         success(true);
-      } catch (err) {
+      } on FirebaseAuthException catch (err) {
         print(err);
         loading(false);
-        message('El correo o contraseña son inválidos.');
+        message(err.message);
       }
     }
   }
