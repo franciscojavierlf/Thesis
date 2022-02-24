@@ -139,10 +139,10 @@ function networkUp() {
   
   COMPOSE_FILES="-f ${COMPOSE_FILE}"
   if [ "${CERTIFICATE_AUTHORITIES}" == "true" ]; then
-    COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_CA}" #peer0.org1.risks.org #author1.department1.university1.org
-    export BYFN_CA1_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/department1.university1.edu/ca && ls *_sk)
-    export BYFN_CA2_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/department2.university2.edu/ca && ls *_sk)
-    export BYFN_CA3_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/department3.university3.edu/ca && ls *_sk)
+    COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_CA}" #peer0.org1.risks.org #author1.department1.government1.org
+    export BYFN_CA1_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/government1.gov/ca && ls *_sk)
+    export BYFN_CA2_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/ngo1.org/ca && ls *_sk)
+    export BYFN_CA3_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/startup1.com/ca && ls *_sk)
   fi
   COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_COUCH}"
   echo "#################################################################"
@@ -223,17 +223,17 @@ function replacePrivateKey() {
   # The next steps will replace the template's contents with the
   # actual values of the private key file names for the CAs.
   CURRENT_DIR=$PWD
-  cd crypto-config/peerOrganizations/department1.university1.edu/ca/
+  cd crypto-config/peerOrganizations/government1.gov/ca/
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR"
   sed $OPTS "s/CA1_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
   
-  cd crypto-config/peerOrganizations/department2.university2.edu/ca/
+  cd crypto-config/peerOrganizations/ngo1.org/ca/
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR"
   sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
   
-  cd crypto-config/peerOrganizations/department3.university3.edu/ca/
+  cd crypto-config/peerOrganizations/startup1.com/ca/
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR"
   sed $OPTS "s/CA3_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-e2e.yaml
@@ -327,7 +327,7 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "####   Generating anchor peer update for department1MSP - university1  ##"
+  echo "####   Generating anchor peer update for department1MSP - government1  ##"
   echo "#################################################################"
   set -x
   configtxgen -profile RedPruebaChannel1 -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME_1 -asOrg Org1MSP
@@ -340,7 +340,7 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "####   Generating anchor peer update for department1MSP - university2  ##"
+  echo "####   Generating anchor peer update for department1MSP - ngo1  ##"
   echo "#################################################################"
   set -x
   configtxgen -profile RedPruebaChannel1 -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME_1 -asOrg Org2MSP
@@ -353,7 +353,7 @@ function generateChannelArtifacts() {
     
   echo
   echo "#################################################################"
-  echo "###  Generating anchor peer update for department3MSP - university2  ####"
+  echo "###  Generating anchor peer update for department3MSP - ngo1  ####"
   echo "#################################################################"
   set -x
   configtxgen -profile RedPruebaChannel1 -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID $CHANNEL_NAME_1 -asOrg Org3MSP
@@ -371,7 +371,7 @@ function generateChannelArtifacts() {
    
   echo
   echo "#################################################################"
-  echo "### Generating anchor peer update for department2MSP - university2 ###"
+  echo "### Generating anchor peer update for department2MSP - ngo1 ###"
   echo "#################################################################"
   set -x
   configtxgen -profile RedPruebaChannel2 -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors_${CHANNEL_NAME_2}.tx -channelID $CHANNEL_NAME_2 -asOrg Org2MSP
@@ -384,7 +384,7 @@ function generateChannelArtifacts() {
   
     echo
   echo "#################################################################"
-  echo "###  Generating anchor peer update for department3MSP - university3  ####"
+  echo "###  Generating anchor peer update for department3MSP - startup1  ####"
   echo "#################################################################"
   set -x
   configtxgen -profile RedPruebaChannel2 -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors_${CHANNEL_NAME_2}.tx -channelID $CHANNEL_NAME_2 -asOrg Org3MSP

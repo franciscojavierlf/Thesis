@@ -13,9 +13,9 @@ version: '2'
 
 volumes:
   orderer.ecotoken.io:
-  peer0.department1.university1.edu:
-  peer0.department2.university2.edu:
-  peer0.department3.university3.edu:
+  peer0.government1.gov:
+  peer0.ngo1.org:
+  peer0.startup1.com:
 
 networks:
   byfn:
@@ -30,27 +30,27 @@ services:
     networks:
       - byfn
 
-  peer0.department1.university1.edu:
-    container_name: peer0.department1.university1.edu
+  peer0.government1.gov:
+    container_name: peer0.government1.gov
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer0.department1.university1.edu
+      service: peer0.government1.gov
     networks:
       - byfn
 
-  peer0.department2.university2.edu:
-    container_name: peer0.department2.university2.edu
+  peer0.ngo1.org:
+    container_name: peer0.ngo1.org
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer0.department2.university2.edu
+      service: peer0.ngo1.org
     networks:
       - byfn
 
-  peer0.department3.university3.edu:
-    container_name: peer0.department3.university3.edu
+  peer0.startup1.com:
+    container_name: peer0.startup1.com
     extends:
       file:  base/docker-compose-base.yaml
-      service: peer0.department3.university3.edu
+      service: peer0.startup1.com
     networks:
       - byfn
       
@@ -67,13 +67,13 @@ services:
       #- FABRIC_LOGGING_SPEC=INFO
       - FABRIC_LOGGING_SPEC=ERROR
       - CORE_PEER_ID=cli
-      - CORE_PEER_ADDRESS=peer0.department1.university1.edu:5051
+      - CORE_PEER_ADDRESS=peer0.government1.gov:5051
       - CORE_PEER_LOCALMSPID=Org1MSP
       - CORE_PEER_TLS_ENABLED=true
-      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/server.crt
-      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/server.key
-      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/ca.crt
-      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/users/Admin@department1.university1.edu/msp
+      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/users/Admin@government1.gov/msp
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
     command: /bin/bash
     volumes:
@@ -84,8 +84,8 @@ services:
         - ./channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
     depends_on:
       - orderer.ecotoken.io
-      - peer0.department1.university1.edu
-      - peer0.department2.university2.edu
-      - peer0.department3.university3.edu
+      - peer0.government1.gov
+      - peer0.ngo1.org
+      - peer0.startup1.com
     networks:
       - byfn

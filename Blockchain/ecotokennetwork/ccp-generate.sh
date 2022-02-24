@@ -18,31 +18,31 @@ function json_ccp {
 }
 
 ORG=1
-NAME="university1"
+NAME="government1"
 P0PORT=5051
 P1PORT=5056
 CAPORT=5054
-PEERPEM='crypto-config/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/ca.crt'
-CAPEM=crypto-config/peerOrganizations/department1.university1.edu/ca/ca.department1.university1.edu-cert.pem
+PEERPEM='crypto-config/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls/ca.crt'
+CAPEM=crypto-config/peerOrganizations/government1.gov/ca/ca.government1.gov-cert.pem
 
 echo "$(json_ccp $ORG $NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > connection-org1.json
 
 ORG=2
-NAME="university2"
+NAME="ngo1"
 P0PORT=6051
 P1PORT=6056
 CAPORT=6054
-PEERPEM='crypto-config/peerOrganizations/department2.university2.edu/peers/peer0.department2.university2.edu/tls/ca.crt'
-CAPEM=crypto-config/peerOrganizations/department2.university2.edu/ca/ca.department2.university2.edu-cert.pem
+PEERPEM='crypto-config/peerOrganizations/ngo1.org/peers/peer0.ngo1.org/tls/ca.crt'
+CAPEM=crypto-config/peerOrganizations/ngo1.org/ca/ca.ngo1.org-cert.pem
 
 echo "$(json_ccp $ORG $NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > connection-org2.json
 
 ORG=3
-NAME="university3"
+NAME="startup1"
 P0PORT=7051
 P1PORT=7056
 CAPORT=7054
-PEERPEM='crypto-config/peerOrganizations/department3.university3.edu/peers/peer0.department3.university3.edu/tls/ca.crt'
-CAPEM=crypto-config/peerOrganizations/department3.university3.edu/ca/ca.department3.university3.edu-cert.pem
+PEERPEM='crypto-config/peerOrganizations/startup1.com/peers/peer0.startup1.com/tls/ca.crt'
+CAPEM=crypto-config/peerOrganizations/startup1.com/ca/ca.startup1.com-cert.pem
 
 echo "$(json_ccp $ORG $NAME $P0PORT $P1PORT $CAPORT $PEERPEM $CAPEM)" > connection-org3.json

@@ -54,7 +54,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: crypto-config/peerOrganizations/department1.university1.edu/msp
+        MSPDir: crypto-config/peerOrganizations/government1.gov/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -75,7 +75,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.department1.university1.edu
+            - Host: peer0.government1.gov
               Port: 5051
 
     - &Org2
@@ -86,7 +86,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org2MSP
 
-        MSPDir: crypto-config/peerOrganizations/department2.university2.edu/msp
+        MSPDir: crypto-config/peerOrganizations/ngo1.org/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -106,7 +106,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.department2.university2.edu
+            - Host: peer0.ngo1.org
               Port: 6051
 
     - &Org3
@@ -117,7 +117,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org3MSP
 
-        MSPDir: crypto-config/peerOrganizations/department3.university3.edu/msp
+        MSPDir: crypto-config/peerOrganizations/startup1.com/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -138,7 +138,7 @@ Organizations:
             # AnchorPeers defines the location of peers which can be used
             # for cross org gossip communication.  Note, this value is only
             # encoded in the genesis block in the Application section context
-            - Host: peer0.department3.university3.edu
+            - Host: peer0.startup1.com
               Port: 7051
 
 ################################################################################

@@ -20,71 +20,71 @@ services:
     ports:
       - 7050:7050
 ############################# ORG1 #############################
-  peer0.department1.university1.edu:
-    container_name: peer0.department1.university1.edu
+  peer0.government1.gov:
+    container_name: peer0.government1.gov
     extends:
       file: peer-base.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer0.department1.university1.edu
-      - CORE_PEER_ADDRESS=peer0.department1.university1.edu:5051
+      - CORE_PEER_ID=peer0.government1.gov
+      - CORE_PEER_ADDRESS=peer0.government1.gov:5051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:5051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.department1.university1.edu:5052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.government1.gov:5052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:5052
-      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.department1.university1.edu:5056
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.department1.university1.edu:5051
+      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.government1.gov:5056
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.government1.gov:5051
       - CORE_PEER_LOCALMSPID=Org1MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls:/etc/hyperledger/fabric/tls
-        - peer0.department1.university1.edu:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/government1.gov/peers/peer0.government1.gov/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls:/etc/hyperledger/fabric/tls
+        - peer0.government1.gov:/var/hyperledger/production
     ports:
       - 5051:5051
 
 ############################# ORG2 #############################
-  peer0.department2.university2.edu:
-    container_name: peer0.department2.university2.edu
+  peer0.ngo1.org:
+    container_name: peer0.ngo1.org
     extends:
       file: peer-base.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer0.department2.university2.edu
-      - CORE_PEER_ADDRESS=peer0.department2.university2.edu:6051
+      - CORE_PEER_ID=peer0.ngo1.org
+      - CORE_PEER_ADDRESS=peer0.ngo1.org:6051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:6051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.department2.university2.edu:6052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.ngo1.org:6052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:6052
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.department2.university2.edu:6051
-      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.department2.university2.edu:6056
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.ngo1.org:6051
+      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.ngo1.org:6056
       - CORE_PEER_LOCALMSPID=Org2MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/department2.university2.edu/peers/peer0.department2.university2.edu/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/department2.university2.edu/peers/peer0.department2.university2.edu/tls:/etc/hyperledger/fabric/tls
-        - peer0.department2.university2.edu:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/ngo1.org/peers/peer0.ngo1.org/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/ngo1.org/peers/peer0.ngo1.org/tls:/etc/hyperledger/fabric/tls
+        - peer0.ngo1.org:/var/hyperledger/production
     ports:
       - 6051:6051
 
 ############################# ORG3 #############################
-  peer0.department3.university3.edu:
-    container_name: peer0.department3.university3.edu
+  peer0.startup1.com:
+    container_name: peer0.startup1.com
     extends:
       file: peer-base.yaml
       service: peer-base
     environment:
-      - CORE_PEER_ID=peer0.department3.university3.edu
-      - CORE_PEER_ADDRESS=peer0.department3.university3.edu:7051
+      - CORE_PEER_ID=peer0.startup1.com
+      - CORE_PEER_ADDRESS=peer0.startup1.com:7051
       - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
-      - CORE_PEER_CHAINCODEADDRESS=peer0.department3.university3.edu:7052
+      - CORE_PEER_CHAINCODEADDRESS=peer0.startup1.com:7052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.department3.university3.edu:7051
-      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.department3.university3.edu:7056
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.startup1.com:7051
+      #- CORE_PEER_GOSSIP_BOOTSTRAP=peer1.startup1.com:7056
       - CORE_PEER_LOCALMSPID=Org3MSP
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/department3.university3.edu/peers/peer0.department3.university3.edu/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/department3.university3.edu/peers/peer0.department3.university3.edu/tls:/etc/hyperledger/fabric/tls
-        - peer0.department3.university3.edu:/var/hyperledger/production
+        - ../crypto-config/peerOrganizations/startup1.com/peers/peer0.startup1.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/startup1.com/peers/peer0.startup1.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.startup1.com:/var/hyperledger/production
     ports:
       - 7051:7051
 

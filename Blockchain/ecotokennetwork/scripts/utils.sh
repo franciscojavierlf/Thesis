@@ -7,9 +7,9 @@
 # This is a collection of bash functions used by different scripts
 
 ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ecotoken.io/orderers/orderer.ecotoken.io/msp/tlscacerts/tlsca.ecotoken.io-cert.pem
-PEER0_ORG1_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/tls/ca.crt
-PEER0_ORG2_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department2.university2.edu/peers/peer0.department2.university2.edu/tls/ca.crt
-PEER0_ORG3_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department3.university3.edu/peers/peer0.department3.university3.edu/tls/ca.crt
+PEER0_ORG1_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/peers/peer0.government1.gov/tls/ca.crt
+PEER0_ORG2_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ngo1.org/peers/peer0.ngo1.org/tls/ca.crt
+PEER0_ORG3_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/startup1.com/peers/peer0.startup1.com/tls/ca.crt
 
 # verify the result of the end-to-end test
 verifyResult() {
@@ -34,34 +34,34 @@ setGlobals() {
   if [ $ORG -eq 1 ]; then
 	  CORE_PEER_LOCALMSPID="Org1MSP"
 	  #CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG1_CA
-    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/users/Admin@department1.university1.edu/msp
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/users/Admin@government1.gov/msp
     if [ $PEER -eq 0 ]; then
-	    CORE_PEER_ADDRESS=peer0.department1.university1.edu:5051
+	    CORE_PEER_ADDRESS=peer0.government1.gov:5051
     else
-	    CORE_PEER_ADDRESS=peer1.department1.university1.edu:5056
-      PEER0_ORG1_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department1.university1.edu/peers/peer1.department1.university1.edu/tls/ca.crt
+	    CORE_PEER_ADDRESS=peer1.government1.gov:5056
+      PEER0_ORG1_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/government1.gov/peers/peer1.government1.gov/tls/ca.crt
     fi
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG1_CA
   elif [ $ORG -eq 2 ]; then
     CORE_PEER_LOCALMSPID="Org2MSP"
     #CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
-    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department2.university2.edu/users/Admin@department2.university2.edu/msp
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ngo1.org/users/Admin@ngo1.org/msp
     if [ $PEER -eq 0 ]; then
-      CORE_PEER_ADDRESS=peer0.department2.university2.edu:6051
+      CORE_PEER_ADDRESS=peer0.ngo1.org:6051
 	  else
-	    CORE_PEER_ADDRESS=peer1.department2.university2.edu:6056
-      PEER0_ORG2_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department2.university2.edu/peers/peer1.department2.university2.edu/tls/ca.crt
+	    CORE_PEER_ADDRESS=peer1.ngo1.org:6056
+      PEER0_ORG2_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ngo1.org/peers/peer1.ngo1.org/tls/ca.crt
 	  fi
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
   elif [ $ORG -eq 3 ]; then
     CORE_PEER_LOCALMSPID="Org3MSP"
     #CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
-    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department3.university3.edu/users/Admin@department3.university3.edu/msp
+    CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/startup1.com/users/Admin@startup1.com/msp
 	  if [ $PEER -eq 0 ]; then
-      CORE_PEER_ADDRESS=peer0.department3.university3.edu:7051
+      CORE_PEER_ADDRESS=peer0.startup1.com:7051
 	  else
-	    CORE_PEER_ADDRESS=peer1.department3.university3.edu:7056
-      PEER0_ORG3_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/department3.university3.edu/peers/peer1.department3.university3.edu/tls/ca.crt
+	    CORE_PEER_ADDRESS=peer1.startup1.com:7056
+      PEER0_ORG3_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/startup1.com/peers/peer1.startup1.com/tls/ca.crt
 	  fi
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG3_CA
   else
