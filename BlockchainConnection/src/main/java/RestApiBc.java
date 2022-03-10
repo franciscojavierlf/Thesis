@@ -23,10 +23,6 @@ public class RestApiBc {
   }
 
   public void start() throws Exception {
-    System.out.println(" Setting up Rest API please wait few seconds ::: ");
-    // ####################
-
-    Spark.port(23456);
     Gson gson = new Gson();
 
 
@@ -104,7 +100,7 @@ public class RestApiBc {
       return result; //gson.toJson(myData);
 
     });
-
+    /*
     Spark.post("/createCar/:id", (req, res) -> {
 
       Fabcar myData = gson.fromJson(req.body(), Fabcar.class);
@@ -168,6 +164,7 @@ public class RestApiBc {
 
       return "";
     });
+    */
 
     // Wait for 10 seconds
     try {

@@ -1,12 +1,16 @@
-Configuration.java
- Configuration
-Fabcar.java
- Fabcar
-NewOwner.java
- NewOwner
+connection/Configuration.java
+ connection.Configuration
+logic/Trajectory.java
+ logic.Trajectory
 RestApiBc.java
  RestApiBc
-BCApplication.java
- BCApplication
- BCApplication$1
- BCApplication$1$1
+logic/Wallet.java
+ logic.Wallet
+connection/CryptoBridge.java
+ connection.CryptoBridge
+ connection.CryptoBridge$1
+ connection.CryptoBridge$1$1
+Test.java
+ Test
+connection/Bloc.java
+ connection.Bloc

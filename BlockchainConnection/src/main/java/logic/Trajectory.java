@@ -1,2 +1,4 @@
-package logic;public class Trajectory {
+package logic;
+
+public class Trajectory {
 }

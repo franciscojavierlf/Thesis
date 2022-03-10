@@ -1,5 +1,5 @@
 {
-  "name": "redprueba-org1",
+  "name": "ecotokennetwork-org1",
   "version": "1.0.0",
   "client": {
     "organization": "Org1",
@@ -14,29 +14,16 @@
   "channels": {
     "channel1": {
       "orderers": [
-        "orderer.ciencia.edu"
+        "orderer.ecotoken.io"
       ],
       "peers": {
-        "peer0.department1.university1.edu": {
+        "peer0.government1.gov": {
           "endorsingPeer": true,
           "chaincodeQuery": true,
           "ledgerQuery": true,
           "eventSource": true
         },
-        "peer0.department3.university3.edu": {
-          "endorsingPeer": true,
-          "chaincodeQuery": true,
-          "ledgerQuery": true,
-          "eventSource": true
-        }
-      }
-    },
-    "channel2": {
-      "orderers": [
-        "orderer.ciencia.edu"
-      ],
-      "peers": {
-        "peer0.department2.university2.edu": {
+        "peer0.startup1.com": {
           "endorsingPeer": true,
           "chaincodeQuery": true,
           "ledgerQuery": true,
@@ -49,73 +36,73 @@
     "Org1": {
       "mspid": "Org1MSP",
       "peers": [
-        "peer0.department1.university1.edu"
+        "peer0.government1.gov"
       ],
       "certificateAuthorities": [
-        "ca.department1.university1.edu"
+        "ca.government1.gov"
       ]
     },
     "Org3": {
       "mspid": "Org3MSP",
       "peers": [
-        "peer0.department3.university3.edu"
+        "peer0.startup1.com"
       ],
       "certificateAuthorities": [
-        "ca.department3.university3.edu"
+        "ca.startup1.com"
       ]
     }
   },
   "orderers": {
-    "orderer.ciencia.edu": {
+    "orderer.ecotoken.io": {
       "url": "grpcs://localhost:7050",
       "tlsCACerts": {
-        "path": "crypto-config/ordererOrganizations/ciencia.edu/orderers/orderer.ciencia.edu/msp/tlscacerts/tlsca.ciencia.edu-cert.pem"
+        "path": "crypto-config/ordererOrganizations/ecotoken.io/orderers/orderer.ecotoken.io/msp/tlscacerts/tlsca.ecotoken.io-cert.pem"
       },
       "grpcOptions": {
-        "ssl-target-name-override": "orderer.ciencia.edu",
-        "hostnameOverride": "orderer.ciencia.edu",
+        "ssl-target-name-override": "orderer.ecotoken.io",
+        "hostnameOverride": "orderer.ecotoken.io",
         "grpc-max-send-message-length": 15
       }
     }
   },
   "peers": {
-    "peer0.department1.university1.edu": {
+    "peer0.government1.gov": {
       "url": "grpcs://localhost:5051",
       "tlsCACerts": {
-        "path": "crypto-config/peerOrganizations/department1.university1.edu/peers/peer0.department1.university1.edu/msp/tlscacerts/tlsca.department1.university1.edu-cert.pem"
+        "path": "crypto-config/peerOrganizations/government1.gov/peers/peer0.government1.gov/msp/tlscacerts/tlsca.government1.gov-cert.pem"
       },
       "grpcOptions": {
-        "ssl-target-name-override": "peer0.department1.university1.edu",
-        "hostnameOverride": "peer0.department1.university1.edu"
+        "ssl-target-name-override": "peer0.government1.gov",
+        "hostnameOverride": "peer0.government1.gov"
       }
     },
-    "peer0.department3.university3.edu": {
+    "peer0.startup1.com": {
       "url": "grpcs://localhost:7051",
       "tlsCACerts": {
-        "path": "crypto-config/peerOrganizations/department3.university3.edu/peers/peer0.department3.university3.edu/msp/tlscacerts/tlsca.department3.university3.edu-cert.pem"
+        "path": "crypto-config/peerOrganizations/startup1.com/peers/peer0.startup1.com/msp/tlscacerts/tlsca.startup1.com-cert.pem"
       },
       "grpcOptions": {
-        "ssl-target-name-override": "peer0.department3.university3.edu",
-        "hostnameOverride": "peer0.department3.university3.edu"
+        "ssl-target-name-override": "peer0.startup1.com",
+        "hostnameOverride": "peer0.startup1.com"
       }
     }
   },
   "certificateAuthorities": {
-    "ca.department1.university1.edu": {
+    "ca.government1.gov": {
       "url": "https://localhost:5054",
       "caName": "ca-org1",
       "tlsCACerts": {
-        "path" : "crypto-config/peerOrganizations/department1.university1.edu/ca/ca.department1.university1.edu-cert.pem"
+        "path" : "crypto-config/peerOrganizations/government1.gov/ca/ca.government1.gov-cert.pem"
       },
       "httpOptions": {
         "verify": false
       }
     },
-    "ca.department3.university3.edu": {
+    "ca.startup1.com": {
       "url": "https://localhost:7054",
       "caName": "ca-org3",
       "tlsCACerts": {
-        "path": "crypto-config/peerOrganizations/department3.university3.edu/ca/ca.department3.university3.edu-cert.pem"
+        "path": "crypto-config/peerOrganizations/startup1.com/ca/ca.startup1.com-cert.pem"
       },
       "httpOptions": {
         "verify": false
