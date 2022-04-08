@@ -60,6 +60,7 @@ type Trajectory struct {
 	Path 					[][]float64 `json:"Path"`
 	Transport 		string `json:"Transport"`
 	Owner 				string `json:"Owner"`
+	Type 					string `json:"Type"`
 }
 
 type Wallet struct {
@@ -73,6 +74,7 @@ type Wallet struct {
 	TotalCarbonSaved 				float64 `json:"TotalCarbonSaved"`
 	TotalCarbonEmitted 			float64 `json:"TotalCarbonEmitted"`
 	TotalTimeTravelled 			uint32 `json:"TotalTimeTravelled"`
+	Type 										string `json:"Type"`
 }
 
 // Structure used for handling result of a wallet's query
@@ -182,6 +184,7 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 		Path: path,
 		Transport: transport,
 		Owner: owner,
+		Type: "trajectory",
 	}
 
 	trajectoryAsBytes, _ := json.Marshal(trajectory)
@@ -218,6 +221,7 @@ func (s *SmartContract) AddEmptyWallet(ctx contractapi.TransactionContextInterfa
 		TotalCarbonSaved: 0.0,
 		TotalCarbonEmitted: 0.0,
 		TotalTimeTravelled: 0,
+		Type: "wallet",
 	}
 
 	walletAsBytes, _ := json.Marshal(wallet)
@@ -245,6 +249,37 @@ func (s *SmartContract) QueryWallet(ctx contractapi.TransactionContextInterface,
 	_ = json.Unmarshal(walletAsBytes, wallet)
 
 	return wallet, nil
+}
+
+// Returns all trajectories from a wallet.
+func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInterface, walletId string) ([]TrajectoryQueryResult, error) {
+	startKey := ""
+	endKey := ""
+
+	resultsIterator, err := ctx.GetStub().GetStateByRange(startKey, endKey)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resultsIterator.Close()
+
+	results := []TrajectoryQueryResult{}
+
+	for resultsIterator.HasNext() {
+		queryResponse, err := resultsIterator.Next()
+
+		if err != nil {
+			return nil, err
+		}
+
+		trajectory := new(Trajectory)
+		_ = json.Unmarshal(queryResponse.Value, trajectory)
+
+		queryResult := TrajectoryQueryResult{Key: queryResponse.Key, Record: trajectory}
+		results = append(results, queryResult)
+	}
+
+	return results, nil
 }
 
 // Returns all wallets found in world state.

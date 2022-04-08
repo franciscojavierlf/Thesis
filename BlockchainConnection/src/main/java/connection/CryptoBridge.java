@@ -15,7 +15,7 @@ import java.security.PrivateKey;
 import java.util.Properties;
 import java.util.Set;
 
-public class CryptoBridge {
+public final class CryptoBridge {
   public static String connection;
   public static String user;
   public static String channel;

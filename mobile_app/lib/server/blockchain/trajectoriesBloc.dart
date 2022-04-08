@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecotoken/logic/profile.dart';
 import 'package:ecotoken/logic/trajectory.dart';
+import 'package:ecotoken/server/blockchain/restConnection.dart';
 import 'package:ecotoken/server/blockchain/walletsBloc.dart';
 import 'package:ecotoken/server/database/profilesBloc.dart';
 import 'package:ecotoken/utils/extensions.dart';
@@ -88,35 +89,41 @@ abstract class TrajectoriesBloc {
   }
 
   static Future<List<Trajectory>> getTrajectories({Profile? owner}) async {
-    // FOR NOW, IT REACHES FIREBASE. IT SHOULD REACH THE BLOCKCHAIN.
-
     final profiles = <String, Profile>{};
-
-    var query = _db.collection('trajectories');
-    var snapshot;
-
-    // Gets all trajectories
-    if (owner == null) {
-      snapshot = await query.orderBy('finish', descending: true).get();
-
-      // Gets profiles
-      final futureProfiles = snapshot.docs
-          .map((doc) => ProfilesBloc.getProfile(doc.data()['owner']))
-          .toList();
-      (await Future.wait(futureProfiles)).forEach(
-          (profile) => profile != null ? profiles[profile.id] = profile : null);
-    }
-    // Gets of only one owner
-    else {
-      snapshot = await query.where('owner', isEqualTo: owner.id).orderBy('finish', descending: true).get();
-      profiles[owner.id] = owner;
+    // Gets queries from the owner
+    if (owner != null) {
+      final List<Map<String, dynamic>> res = await RestConnection.get('/wallets/${owner.wallet}/trajectories');
+      print(res);
+      return res.map((t) => _trajectoryFromMap(t['_id'], owner, t)).toList();
     }
 
-    final res = <Trajectory>[];
-    snapshot.docs.forEach((doc) => res.add(_trajectoryFromMap(
-        doc.id, profiles[doc.data()!['owner']]!, doc.data()!)));
+    return [];
 
-    return res;
+    // final profiles = <String, Profile>{};
+
+    // var query = _db.collection('trajectories');
+    // var snapshot;
+
+    // // Gets all trajectories
+    // if (owner == null) {
+    //   snapshot = await query.orderBy('finish', descending: true).get();
+
+    //   // Gets profiles
+    //   final futureProfiles = snapshot.docs
+    //       .map((doc) => ProfilesBloc.getProfile(doc.data()['owner']))
+    //       .toList();
+    //   (await Future.wait(futureProfiles)).forEach(
+    //       (profile) => profile != null ? profiles[profile.id] = profile : null);
+    // }
+    // // Gets of only one owner
+    // else {
+    //   snapshot = await query.where('owner', isEqualTo: owner.id).orderBy('finish', descending: true).get();
+    //   profiles[owner.id] = owner;
+    // }
+
+    // final res = <Trajectory>[];
+    // snapshot.docs.forEach((doc) => res.add(_trajectoryFromMap(
+    //     doc.id, profiles[doc.data()!['owner']]!, doc.data()!)));
   }
 
   static Map<String, dynamic> _trajectoryToMap(Trajectory trajectory) {
