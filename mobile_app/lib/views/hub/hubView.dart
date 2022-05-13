@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// The view that contains all the main views.
-class HubView extends GetView<HubController> {
+class HubView extends StatefulWidget {
   HubView(int? selectedIndex) {
     Get.put(HubController(selectedIndex));
   }

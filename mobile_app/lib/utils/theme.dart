@@ -21,7 +21,16 @@ extension DoubleUtils on num {
 extension WidgetUtils on Widget {
   Expanded get expanded => Expanded(child: this);
   Center get centered => Center(child: this);
-  Align align(Alignment align) => Align(alignment: align, child: this);  
+  Align align(Alignment align) => Align(alignment: align, child: this);
   SizedBox box({double? width, double? height}) =>
       SizedBox(child: this, width: width, height: height);
+  Padding paddingOnly({
+    double l = 0,
+    double r = 0,
+    double t = 0,
+    double b = 0,
+  }) =>
+      Padding(
+          padding: EdgeInsets.only(left: l, right: r, top: t, bottom: b),
+          child: this);
 }

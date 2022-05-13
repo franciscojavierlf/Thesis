@@ -1,4 +1,5 @@
 import 'package:ecotoken/logic/trajectory.dart';
+import 'package:ecotoken/server/blockchain/restConnection.dart';
 import 'package:ecotoken/views/trajectory/currentTrajectoryView.dart';
 import 'package:ecotoken/widgets/ecoText.dart';
 import 'package:ecotoken/utils/theme.dart';
@@ -108,6 +109,7 @@ class HomeView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            ElevatedButton(onPressed: () => print(RestConnection.get('/hello')), child: Text('test')),
                             EcoText.h1(
                                 'Hola, ${mainController.profile?.name.first}'),
                             SizedBox(height: 25),

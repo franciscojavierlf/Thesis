@@ -1,7 +1,6 @@
 import 'package:ecotoken/views/hub/hubLayout.dart';
 import 'package:ecotoken/widgets/ecoText.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class AboutView extends StatelessWidget {
   @override
@@ -14,7 +13,7 @@ class AboutView extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               GestureDetector(
-                onTap: () => Get.back(),
+                onTap: () => Navigator.pop(context),
                 child:EcoText.h1('<'),),
               SizedBox(width: 10),
               EcoText.h3('Acerca de'),

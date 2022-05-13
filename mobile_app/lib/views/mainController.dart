@@ -1,4 +1,5 @@
 import 'package:ecotoken/logic/profile.dart';
+import 'package:ecotoken/server/blockchain/restConnection.dart';
 import 'package:ecotoken/server/database/profilesBloc.dart';
 import 'package:ecotoken/views/auth/loginView.dart';
 import 'package:ecotoken/views/hub/hubView.dart';
@@ -15,6 +16,8 @@ class MainController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Initializes data for rest connection
+    RestConnection.init();
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null)
         ProfilesBloc.getProfile(user.uid).then((value) {

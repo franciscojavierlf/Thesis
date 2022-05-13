@@ -3,14 +3,13 @@ import 'package:ecotoken/utils/theme.dart';
 import 'package:ecotoken/widgets/ecoText.dart';
 import 'package:ecotoken/widgets/transportIcon.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_utils/src/extensions/widget_extensions.dart';
 
 class TransportsTable extends StatelessWidget {
-  double? motorcycle;
-  double? metro;
-  double? bus;
-  double? walking;
-  double? bicycle;
+  final double? motorcycle;
+  final double? metro;
+  final double? bus;
+  final double? walking;
+  final double? bicycle;
 
   TransportsTable({
     this.motorcycle,
@@ -35,10 +34,10 @@ class TransportsTable extends StatelessWidget {
                           TransportIcon(Transport.Motorcycle, size: 16),
                           end: true)
                       .align(Alignment.centerRight)
-                      .paddingOnly(right: leftColumnPadding)),
+                      .paddingOnly(r: leftColumnPadding)),
               TableCell(
                   child: EcoText.p('${motorcycle!.toStringAsFixed(2)}kg')
-                      .paddingOnly(left: rightColumnPadding)),
+                      .paddingOnly(l: rightColumnPadding)),
             ],
           ),
         if (metro != null)
@@ -49,10 +48,10 @@ class TransportsTable extends StatelessWidget {
                           'Metro', TransportIcon(Transport.Metro, size: 16),
                           end: true)
                       .align(Alignment.centerRight)
-                      .paddingOnly(right: leftColumnPadding)),
+                      .paddingOnly(r: leftColumnPadding)),
               TableCell(
                   child: EcoText.p('${metro!.toStringAsFixed(2)}kg')
-                      .paddingOnly(left: rightColumnPadding)),
+                      .paddingOnly(l: rightColumnPadding)),
             ],
           ),
         if (bus != null)
@@ -63,10 +62,10 @@ class TransportsTable extends StatelessWidget {
                           'Autobús', TransportIcon(Transport.Bus, size: 16),
                           end: true)
                       .align(Alignment.centerRight)
-                      .paddingOnly(right: leftColumnPadding)),
+                      .paddingOnly(r: leftColumnPadding)),
               TableCell(
                   child: EcoText.p('${bus!.toStringAsFixed(2)}kg')
-                      .paddingOnly(left: rightColumnPadding)),
+                      .paddingOnly(l: rightColumnPadding)),
             ],
           ),
         if (walking != null)
@@ -77,10 +76,10 @@ class TransportsTable extends StatelessWidget {
                           TransportIcon(Transport.Walking, size: 16),
                           end: true)
                       .align(Alignment.centerRight)
-                      .paddingOnly(right: leftColumnPadding)),
+                      .paddingOnly(r: leftColumnPadding)),
               TableCell(
                   child: EcoText.p('${walking!.toStringAsFixed(2)}kg')
-                      .paddingOnly(left: rightColumnPadding)),
+                      .paddingOnly(l: rightColumnPadding)),
             ],
           ),
         if (bicycle != null)
@@ -91,10 +90,10 @@ class TransportsTable extends StatelessWidget {
                           TransportIcon(Transport.Bicycle, size: 16),
                           end: true)
                       .align(Alignment.centerRight)
-                      .paddingOnly(right: leftColumnPadding)),
+                      .paddingOnly(r: leftColumnPadding)),
               TableCell(
                   child: EcoText.p('${bicycle!.toStringAsFixed(2)}kg')
-                      .paddingOnly(left: rightColumnPadding)),
+                      .paddingOnly(l: rightColumnPadding)),
             ],
           ),
       ],
