@@ -1,39 +1,52 @@
 import 'package:ecotoken/logic/trajectory.dart';
+import 'package:ecotoken/server/blockchain/trajectoriesBloc.dart';
 import 'package:ecotoken/utils/extensions.dart';
+import 'package:ecotoken/utils/functions.dart';
 import 'package:ecotoken/utils/theme.dart';
 import 'package:ecotoken/views/hub/hubLayout.dart';
 import 'package:ecotoken/views/hub/hubView.dart';
-import 'package:ecotoken/views/trajectory/trajectoryController.dart';
 import 'package:ecotoken/widgets/ecoButton.dart';
 import 'package:ecotoken/widgets/ecoText.dart';
 import 'package:ecotoken/widgets/transportIcon.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-class TrajectoryView extends StatelessWidget {
-  final controller = Get.put(TrajectoryController());
+class TrajectoryView extends StatefulWidget {
+  final Trajectory trajectory;
   final bool finished;
 
-  TrajectoryView(Trajectory trajectory) : finished = false {
-    controller.trajectory = trajectory;
-  }
+  TrajectoryView(this.trajectory) : finished = false;
+  TrajectoryView.finished(this.trajectory) : finished = true;
 
-  TrajectoryView.finished(Trajectory trajectory) : finished = true {
-    controller.trajectory = trajectory;
+  @override
+  State<StatefulWidget> createState() => _State();
+}
+
+class _State extends State<TrajectoryView> {
+  var loading = false;
+
+  void uploadTrajectory() async {
+    setState(() => loading = true);
+    try {
+      await TrajectoriesBloc.addTrajectory(widget.trajectory);
+      setState(() => loading = false);
+    } catch (ex) {
+      print('Error adding trajectory');
+      setState(() => loading = false);
+    }
+    goto(context, HubView(1), replace: true);
   }
 
   @override
   Widget build(BuildContext context) {
     final screen = MediaQuery.of(context).size;
-
     return HubLayout(
       scroll: false,
       body: Column(
         children: [
           ListTile(
-            leading: TransportIcon(controller.trajectory!.transport, size: 50),
-            title: EcoText.h3(finished ? 'Recorrido terminado' : 'Recorrido'),
-            subtitle: EcoText.p(controller.trajectory!.finish.niceString),
+            leading: TransportIcon(widget.trajectory.transport, size: 50),
+            title: EcoText.h3(widget.finished ? 'Recorrido terminado' : 'Recorrido'),
+            subtitle: EcoText.p(widget.trajectory.finish.niceString),
           ),
           SizedBox(height: 20),
           // Info
@@ -44,7 +57,7 @@ class TrajectoryView extends StatelessWidget {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(controller.trajectory!.distance.toStringAsFixed(2)),
+                  EcoText.h2(widget.trajectory.distance.toStringAsFixed(2)),
                   EcoText.p('km'),
                 ],
               ),
@@ -52,7 +65,7 @@ class TrajectoryView extends StatelessWidget {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(controller.trajectory!.duration.niceString),
+                  EcoText.h2(widget.trajectory.duration.niceString),
                   EcoText.p('tiempo'),
                 ],
               ),
@@ -60,8 +73,7 @@ class TrajectoryView extends StatelessWidget {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(
-                      controller.trajectory!.carbonEmitted.toStringAsFixed(2)),
+                  EcoText.h2(widget.trajectory.carbonEmitted.toStringAsFixed(2)),
                   EcoText.p(CO2),
                 ],
               ),
@@ -90,35 +102,34 @@ class TrajectoryView extends StatelessWidget {
             spacing: 25,
             children: [
               TransportIcon(Transport.Car),
-              EcoText.p(
-                  '${controller.trajectory!.carbonSaved.toStringAsFixed(2)}kg'),
+              EcoText.p('${widget.trajectory.carbonSaved.toStringAsFixed(2)}kg'),
             ],
           ).expanded,
 
           // Bottom
-          EcoText.p(finished ? 'Has generado' : 'Generaste').centered,
+          EcoText.p(widget.finished ? 'Has generado' : 'Generaste').centered,
           SizedBox(height: 10),
-          EcoText.pIcon(controller.trajectory!.tokens.toStringAsFixed(8),
+          EcoText.pIcon(widget.trajectory.tokens.toStringAsFixed(8),
               Image.asset('assets/images/logo.png', width: 30)),
           SizedBox(height: 25),
-          if (finished)
-            Obx(
-              () => controller.loading.value
-                  ? EcoText.h4('Cargando...')
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        EcoButton(
-                            onPressed: () => Get.offAll(HubView(0)),
-                            child: Text('Eliminar')),
-                        EcoButton(
-                            onPressed: controller.uploadTrajectory,
-                            child: Text('Guardar')),
-                      ],
-                    ),
-            )
+          if (widget.finished)
+            (loading
+                ? EcoText.h4('Cargando...')
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      EcoButton(
+                          onPressed: () =>
+                              goto(context, HubView(0), replace: true),
+                          child: Text('Eliminar')),
+                      EcoButton(
+                          onPressed: uploadTrajectory, child: Text('Guardar')),
+                    ],
+                  ))
           else
-            EcoButton(onPressed: () => Get.back(), child: Text('Regresar')),
+            EcoButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Regresar')),
         ],
       ),
     );

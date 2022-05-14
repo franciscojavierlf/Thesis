@@ -24,6 +24,8 @@ extension WidgetUtils on Widget {
   Align align(Alignment align) => Align(alignment: align, child: this);
   SizedBox box({double? width, double? height}) =>
       SizedBox(child: this, width: width, height: height);
+  Padding paddingAll(double value) =>
+      Padding(padding: EdgeInsets.all(value), child: this);
   Padding paddingOnly({
     double l = 0,
     double r = 0,

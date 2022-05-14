@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 /// Global variables because using redux is too much for the app.
 
 class Global {
+  Global._();
+  
   static Profile? _profile = null;
   static Profile? get profile => _profile;
 

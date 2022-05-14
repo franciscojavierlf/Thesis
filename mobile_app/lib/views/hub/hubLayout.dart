@@ -1,6 +1,5 @@
 import 'package:ecotoken/utils/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_utils/src/extensions/widget_extensions.dart';
 
 class HubLayout extends StatelessWidget {
   final Widget body;

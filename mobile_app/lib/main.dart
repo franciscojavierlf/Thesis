@@ -1,6 +1,5 @@
 import 'package:ecotoken/utils/global.dart';
 import 'package:ecotoken/views/auth/loginView.dart';
-import 'package:ecotoken/views/mainController.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

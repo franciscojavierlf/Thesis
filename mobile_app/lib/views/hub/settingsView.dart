@@ -1,17 +1,13 @@
+import 'package:ecotoken/utils/functions.dart';
 import 'package:ecotoken/views/hub/hubLayout.dart';
 import 'package:ecotoken/views/hub/settings/aboutView.dart';
 import 'package:ecotoken/views/hub/settings/co2View.dart';
 import 'package:ecotoken/widgets/ecoText.dart';
 import 'package:ecotoken/utils/theme.dart';
-import 'package:ecotoken/views/hub/settingsController.dart';
-import 'package:ecotoken/views/mainController.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class SettingsView extends StatelessWidget {
-  final mainController = Get.find<MainController>();
-  final controller = Get.put(SettingsController());
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +25,7 @@ class SettingsView extends StatelessWidget {
               ListTile(
                 title: EcoText.h4('¿Cómo se calcula el $CO2?'),
                 tileColor: Colors.white,
-                onTap: () => Get.to(CO2View()),
+                onTap: () => goto(context, CO2View()),
                 shape: RoundedRectangleBorder(
                   side: BorderSide(color: Palette.lightBgColor),
                   borderRadius: BorderRadius.only(
@@ -41,7 +37,7 @@ class SettingsView extends StatelessWidget {
               ListTile(
                 title: EcoText.h4('Acerca de'),
                 tileColor: Colors.white,
-                onTap: () => Get.to(AboutView()),
+                onTap: () => goto(context, AboutView()),
               ),
               ListTile(
                 leading: Icon(Icons.exit_to_app, color: Palette.D),

@@ -1,20 +1,124 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecotoken/logic/trajectory.dart';
+import 'package:ecotoken/server/blockchain/trajectoriesBloc.dart';
+import 'package:ecotoken/utils/extensions.dart';
+import 'package:ecotoken/utils/functions.dart';
+import 'package:ecotoken/utils/global.dart';
+import 'package:ecotoken/utils/gps.dart';
 import 'package:ecotoken/utils/theme.dart';
-import 'package:ecotoken/views/trajectory/currentTrajectoryController.dart';
+import 'package:ecotoken/views/hub/hubView.dart';
+import 'package:ecotoken/views/trajectory/trajectoryView.dart';
 import 'package:ecotoken/widgets/transportIcon.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 /// A trajectory running.
-class CurrentTrajectoryView extends StatelessWidget {
-  final controller = Get.put(CurrentTrajectoryController());
+class CurrentTrajectoryView extends StatefulWidget {
+  final Transport transport;
 
-  CurrentTrajectoryView(Transport transport) {
-    controller.start(transport);
+  CurrentTrajectoryView(this.transport);
+
+  @override
+  State<StatefulWidget> createState() => _State();
+}
+
+class _State extends State<CurrentTrajectoryView> {
+  final profile = Global.profile!;
+  final borderColor = Color(0xff797659);
+
+
+  var stopwatch = StopWatchTimer();
+  var paused = false;
+  var distance = 0.0;
+  int duration = 0; // Updated in the view
+  bool first = false;
+  final List<GeoPoint> path = [];
+  StreamSubscription<Position>? subscription;
+
+  @override
+  void dispose() {
+    super.dispose();
+    subscription?.cancel();
+    stopwatch.dispose();
   }
 
-  static const borderColor = Color(0xff797659);
+  @override
+  void initState() {
+    super.initState();
+    stopwatch = StopWatchTimer();
+    path.clear();
+    GPS.getPositionStream().then((stream) {
+      subscription = stream.listen((position) {
+        final point = GeoPoint(position.latitude, position.longitude);
+        if (!first)
+          first = true;
+        else
+          setState(() => distance += path.last.distance(point));
+        path.add(point);
+      });
+      stopwatch.onExecute.add(StopWatchExecute.start);
+    }).catchError((err) {
+      goto(context, HubView(0), replace: true);
+    });
+    first = false;
+  }
+
+  void pause() {
+    stopwatch.onExecute.add(StopWatchExecute.stop);
+    setState(() => paused = true);
+  }
+
+  void play() {
+    stopwatch.onExecute.add(StopWatchExecute.start);
+    setState(() => paused = false);
+  }
+
+  void stop() {
+    pause();
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('¿Seguro que deseas terminar el trayecto?'),
+        actions: [
+          TextButton(
+            child: Text('Terminar'),
+            onPressed: finishTrajectory,
+          ),
+          TextButton(
+            child: Text('Descartar'),
+            onPressed: () => goto(context, HubView(0), replace: true),
+          ),
+          TextButton(
+            child: Text('Cancelar'),
+            onPressed: () {
+              play();
+              Navigator.pop(context);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void finishTrajectory() async {
+    // Saves trajectory
+    try {
+      final trajectory = TrajectoriesBloc.generateTrajectory(
+        owner: profile,
+        duration: Duration(milliseconds: duration),
+        path: path,
+        transport: widget.transport,
+      );
+      goto(context, TrajectoryView.finished(trajectory));
+    } catch (ex) {
+      print(ex);
+      goto(context, HubView(0), replace: true);
+    }
+  }
 
   /// Special text for this screen.
   Text _specialText(
@@ -74,14 +178,14 @@ class CurrentTrajectoryView extends StatelessWidget {
                 spacing: -15,
                 children: [
                   StreamBuilder<int>(
-                      stream: controller.stopwatch.rawTime,
+                      stream: stopwatch.rawTime,
                       initialData: 0,
                       builder: (context, snapshot) {
-                        controller.duration = snapshot.data ?? 0;
+                        duration = snapshot.data ?? 0;
                         bool hours = false;
-                        if (controller.duration / 6000000 > 1) hours = true;
+                        if (duration / 6000000 > 1) hours = true;
                         final displayTime = StopWatchTimer.getDisplayTime(
-                          controller.duration,
+                          duration,
                           milliSecond: false,
                           hours: hours,
                         );
@@ -105,10 +209,10 @@ class CurrentTrajectoryView extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: -25,
                 children: [
-                  Obx(() => _specialText(
-                      controller.distance.value.toStringAsFixed(2),
+                  _specialText(
+                      distance.toStringAsFixed(2),
                       size: 80.px,
-                      bold: true)),
+                      bold: true),
                   _specialText('Kilómetros', size: 20.px),
                 ],
               ).centered,
@@ -130,7 +234,7 @@ class CurrentTrajectoryView extends StatelessWidget {
                     crossAxisAlignment: WrapCrossAlignment.center,
                     spacing: -10,
                     children: [
-                      TransportIcon(controller.transport!,
+                      TransportIcon(widget.transport,
                           color: Colors.white, size: 75),
                       _specialText('Transporte', size: 18.px),
                     ],
@@ -160,13 +264,12 @@ class CurrentTrajectoryView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Obx(
-                  () => controller.paused.value
+                paused
                       ?
                       // Play button
                       _specialButton(
                           color: Color(0xffEEE062).withOpacity(0.6),
-                          onPressed: controller.play,
+                          onPressed: play,
                           child: Icon(Icons.play_arrow,
                               size: screen.height * 0.075),
                         )
@@ -174,14 +277,14 @@ class CurrentTrajectoryView extends StatelessWidget {
                       // Pause button
                       _specialButton(
                           color: Color(0xffA19C72).withOpacity(0.6),
-                          onPressed: controller.pause,
+                          onPressed: pause,
                           child: Icon(Icons.pause, size: screen.height * 0.075),
                         ),
-                ),
+                
                 // Stop button
                 _specialButton(
                   color: Palette.E,
-                  onPressed: () => controller.stop(context),
+                  onPressed: stop,
                   child: Icon(Icons.stop, size: screen.height * 0.075),
                 ),
               ],
