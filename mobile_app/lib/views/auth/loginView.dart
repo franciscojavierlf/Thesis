@@ -45,7 +45,7 @@ class _State extends State<LoginView> {
       try {
         setState(() => loading = true);
         await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text,
+          email: emailController.text.trim(),
           password: passwordController.text,
         );
         message = '¡Inicio de sesión logrado!';

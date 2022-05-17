@@ -20,6 +20,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _State extends State<HomeView> {
+  final isDialOpen = ValueNotifier(false);
   final profile = Global.profile!;
   Wallet? wallet;
   var error = false;
@@ -43,8 +44,6 @@ class _State extends State<HomeView> {
       setState(() => error = true);
     }
   }
-
-  final isDialOpen = ValueNotifier(false);
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +136,6 @@ class _State extends State<HomeView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ElevatedButton(
-                              onPressed: () =>
-                                  print(RestConnection.get('/hello')),
-                              child: Text('test')),
                           EcoText.h1('Hola, ${profile.name.first}'),
                           SizedBox(height: 25),
                           // Tokens display

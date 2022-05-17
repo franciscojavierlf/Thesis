@@ -25,7 +25,7 @@ class Global {
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null)
         ProfilesBloc.getProfile(user.uid).then((value) {
-          _profile = profile;
+          _profile = value;
           goto(navigatorKey.currentContext!, HubView(0), replace: true);
         }).catchError((err) {
           print(err);
