@@ -18,9 +18,6 @@ public final class RestListener {
     // Starts the connection
     bloc.connect();
 
-    // For testing
-    Spark.get("/hello", (req, res) -> "Hello World!");
-
     // Query all wallets
     Spark.get("/wallets", (req, res) -> bloc.queryAllWallets());
 
@@ -37,8 +34,10 @@ public final class RestListener {
     });
 
     // Creates a new trajectory
-    Spark.post("/addTrajectory", (req, res) -> bloc.addTrajectory(req.body()));
-
+    Spark.post("/addTrajectory/:walletId", (req, res) -> {
+      String walletId = req.params(":walletId");
+      return bloc.addTrajectory(walletId, req.body());
+    });
 
     // Wait for 10 seconds
     try {

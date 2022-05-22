@@ -1,6 +1,5 @@
 /*
 SPDX-License-Identifier: Apache-2.0
-
 */
 
 package main
@@ -46,75 +45,119 @@ func isTransportValid(transport string) bool {
 
 // Describes a trajectory
 type Trajectory struct {
-	Id 						string `json:"Id"`
-	Finish 				uint32 `json:"Finish"`
-	Tokens 				float64 `json:"Tokens"`
-	CarbonEmitted float64 `json:"CarbonEmitted"`
-	CarbonSaved 	float64 `json:"CarbonSaved"`
-	Distance 			float64 `json:"Distance"`
-	Duration 			uint32 `json:"Duration"`
-	Path 					[][]float64 `json:"Path"`
-	Transport 		string `json:"Transport"`
-	Owner 				string `json:"Owner"`
-	Type 					string `json:"Type"`
+	Id 						string `json:"id"`
+	Finish 				uint64 `json:"finish"`
+	Tokens 				float64 `json:"tokens"`
+	CarbonEmitted float64 `json:"carbonEmitted"`
+	CarbonSaved 	float64 `json:"carbonSaved"`
+	Distance 			float64 `json:"distance"`
+	Duration 			uint64 `json:"duration"`
+	Path 					[][]float64 `json:"path"`
+	Transport 		string `json:"transport"`
+	Owner 				string `json:"owner"`
+	Type 					string `json:"type"`
+}
+
+// Defines a new trajectory that a user sends
+type NewTrajectory struct {
+	Duration 	uint64 `json:"duration"`
+	Finish 		uint64 `json:"finish"`
+	Path 			[][]float64 `json:"path"`
+	Transport string `json:"transport"`
 }
 
 type Wallet struct {
-	Id											string `json:"Id"`
-	Tokens 									float64 `json:"Tokens"`
-	CarbonEmitted 					map[string]float64 `json:"CarbonEmitted"`
-	CarbonSaved 						map[string]float64 `json:"CarbonSaved"`
-	TimeTravelled 					map[string]float64 `json:"TimeTravelled"`
-	DistanceTravelled 			map[string]float64 `json:"DistanceTravelled"`
-	TotalDistanceTravelled 	float64 `json:"TotalDistanceTravelled"`
-	TotalCarbonSaved 				float64 `json:"TotalCarbonSaved"`
-	TotalCarbonEmitted 			float64 `json:"TotalCarbonEmitted"`
-	TotalTimeTravelled 			uint32 `json:"TotalTimeTravelled"`
-	Type 										string `json:"Type"`
+	Id											string `json:"id"`
+	Tokens 									float64 `json:"tokens"`
+	CarbonEmitted 					map[string]float64 `json:"carbonEmitted"`
+	CarbonSaved 						map[string]float64 `json:"carbonSaved"`
+	TimeTravelled 					map[string]float64 `json:"timeTravelled"`
+	DistanceTravelled 			map[string]float64 `json:"distanceTravelled"`
+	TotalDistanceTravelled 	float64 `json:"totalDistanceTravelled"`
+	TotalCarbonSaved 				float64 `json:"totalCarbonSaved"`
+	TotalCarbonEmitted 			float64 `json:"totalCarbonEmitted"`
+	TotalTimeTravelled 			uint64 `json:"totalTimeTravelled"`
+	Type 										string `json:"type"`
 }
 
 // Structure used for handling result of a wallet's query
 type WalletQueryResult struct {
-	Key     string `json:"Key"`
+	Key     string `json:"key"`
 	Record *Wallet
 }
 
 // Structure used for handling result of trajectory's query
 type TrajectoryQueryResult struct {
-	Key			string `json:"Key"`
+	Key			string `json:"key"`
 	Record *Trajectory	
 }
 
 // InitLedger adds a base set of cars to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 
-	wallets := []Wallet {
-		Wallet{
-			Id: "c0QOCSutCq82DfIyXBfj",
-			Tokens: 23.0,
-			CarbonEmitted: map[string]float64{
-				"Transport.Walking": 0.1,
-			},
-			CarbonSaved: map[string]float64{
-				"Transport.Walking": 2.3,
-			},
-			TimeTravelled: map[string]float64{
-				"Transport.Walking": 389000,
-			},
-			DistanceTravelled: map[string]float64{
-				"Transport.Walking": 0.8,
-			},
-			TotalDistanceTravelled: 0.916,
-			TotalCarbonSaved: 2.31,
-			TotalCarbonEmitted: 0.11,
-			TotalTimeTravelled: 485243,
-			Type: "wallet",
+	// Adds a single wallet
+	wallet := Wallet{
+		Id: "c0QOCSutCq82DfIyXBfj",
+		Tokens: 23.0,
+		CarbonEmitted: map[string]float64{
+			"Transport.Walking": 0.1,
 		},
+		CarbonSaved: map[string]float64{
+			"Transport.Walking": 2.3,
+		},
+		TimeTravelled: map[string]float64{
+			"Transport.Walking": 389000,
+		},
+		DistanceTravelled: map[string]float64{
+			"Transport.Walking": 0.8,
+		},
+		TotalDistanceTravelled: 0.916,
+		TotalCarbonSaved: 2.31,
+		TotalCarbonEmitted: 0.11,
+		TotalTimeTravelled: 485243,
+		Type: "wallet",
 	}
 
-	for _, wallet := range wallets {
-		walletAsBytes, _ := json.Marshal(wallet)
-		err := ctx.GetStub().PutState(wallet.Id, walletAsBytes)
+	walletAsBytes, _ := json.Marshal(wallet)
+	err := ctx.GetStub().PutState(wallet.Id, walletAsBytes)
+
+	if err != nil {
+		return fmt.Errorf("Failed to put to world state. %s", err.Error())
+	}
+
+	// Adds trajectories
+	trajectories := []Trajectory{
+		Trajectory{
+			Id: "FLBPfISN54AezuuAdwjb",
+			Finish: 1637132794000,
+			Tokens: 23,
+			CarbonEmitted: 0.1,
+			CarbonSaved: 3.4,
+			Distance: 0.8,
+			Duration: 389000,
+			Path: [][]float64{{19.2309, 99.0914}, {19.2257, 99.0919}},
+			Transport: "Transport.Walking",
+			Owner: "c0QOCSutCq82DfIyXBfj",
+			Type: "trajectory",
+		},
+		Trajectory{
+			Id: "kY0SZtn4aBUHBQJ05Tjk",
+			Finish: 1637132794000,
+			Tokens: 0,
+			CarbonEmitted: 0.0010551622068544642,
+			CarbonSaved: 0.0010551622068544642,
+			Distance: 0.043121996659537594,
+			Duration: 69476,
+			Path: [][]float64{{19.2309, 99.0914}, {19.2257, 99.0919}},
+			Transport: "Transport.Walking",
+			Owner: "c0QOCSutCq82DfIyXBfj",
+			Type: "trajectory",
+		},
+	}
+	
+	for _, trajectory := range trajectories {
+		trajectoryAsBytes, _ := json.Marshal(trajectory)
+		err := ctx.GetStub().PutState(trajectory.Id, trajectoryAsBytes)
 
 		if err != nil {
 			return fmt.Errorf("Failed to put to world state. %s", err.Error())
@@ -124,25 +167,22 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	return nil
 }
 
-func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterface, id string, jsonString string) error {
+func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterface, walletId string, jsonString string) error {
 
-	//, id string, walletId string, owner string, duration uint32, finish uint32, path [][]float64, transport string
+	id := uuid.New().String()
 
 	// Converts to json
-	var trajectory map[string]interface{}
-	json.Unmarshal([]byte(jsonString), &trajectory)
-
-	// Gets useful data
-	var transport string = trajectory["transport"]
+	var trajectoryData NewTrajectory
+	json.Unmarshal([]byte(jsonString), &trajectoryData)
 
 	// Logic behind the incentive
-	if transport == "Transport.Car" {
+	if trajectoryData.Transport == "Transport.Car" {
 		return errors.New("Cannot add a trajectory with a car!")
 	}
-	if !isTransportValid(transport) {
-		return errors.New("Transport is not valid: " + transport)
+	if !isTransportValid(trajectoryData.Transport) {
+		return errors.New("Transport is not valid: " + trajectoryData.Transport)
 	}
-	if len(path) < 2 {
+	if len(trajectoryData.Path) < 2 {
 		return errors.New("Path must contain at least two points!")
 	}
 
@@ -155,14 +195,14 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 
 	// Gets total distance
 	var distance float64 = 0.0
-	for i := 1; i < len(path); i++ {
-		distance += getDistance(path[i - 1], path[i])
+	for i := 1; i < len(trajectoryData.Path); i++ {
+		distance += getDistance(trajectoryData.Path[i - 1], trajectoryData.Path[i])
 	}
 
 	// Calculates important data
-	carbonEmitted := distance / float64(duration) * 1000
-	carbonSaved := distance / float64(duration) * 1000
-	switch transport {
+	carbonEmitted := distance / float64(trajectoryData.Duration) * 1000
+	carbonSaved := distance / float64(trajectoryData.Duration) * 1000
+	switch trajectoryData.Transport {
 		case Motorcycle:
 			carbonEmitted *= 0.4
 			carbonSaved *= 0.4
@@ -182,22 +222,19 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 
 	// Creates the trajectory
 	trajectory := Trajectory{
-		Finish: finish,
+		Finish: trajectoryData.Finish,
 		Tokens: tokens,
 		CarbonEmitted: carbonEmitted,
 		CarbonSaved: carbonSaved,
 		Distance: distance,
-		Duration: duration,
-		Path: path,
-		Transport: transport,
-		Owner: owner,
+		Duration: trajectoryData.Duration,
+		Path: trajectoryData.Path,
+		Transport: trajectoryData.Transport,
+		Owner: walletId,
 		Type: "trajectory",
 	}
 
 	trajectoryAsBytes, _ := json.Marshal(trajectory)
-
-	////////// FALTA PONER ID
-	id := uuid().New()
 	ctx.GetStub().PutState(id, trajectoryAsBytes)
 
 	// After adding trajectory, we add the update into the wallet
@@ -210,7 +247,7 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 	wallet.TotalCarbonSaved += carbonSaved
 	wallet.TotalCarbonEmitted += carbonEmitted
 	wallet.TotalDistanceTravelled += distance
-	wallet.TotalTimeTravelled += duration
+	wallet.TotalTimeTravelled += trajectoryData.Duration
 
 	walletAsBytes, _ := json.Marshal(wallet)
 	return ctx.GetStub().PutState(walletId, walletAsBytes)
@@ -263,7 +300,7 @@ func (s *SmartContract) QueryWallet(ctx contractapi.TransactionContextInterface,
 func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInterface, walletId string) ([]TrajectoryQueryResult, error) {
 
 	// Creates a couchdb query
-	query := fmt.Sprintf(`{"selector":{"docType":"asset","Owner":"%s"}}`, walletId)
+	query := fmt.Sprintf(`{"selector":{"type":"trajectory","owner":"%s"}}`, walletId)
 	resultsIterator, err := ctx.GetStub().GetQueryResult(query)
 
 	if err != nil {
@@ -292,10 +329,9 @@ func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInte
 
 // Returns all wallets found in world state.
 func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterface) ([]WalletQueryResult, error) {
-	startKey := ""
-	endKey := ""
 
-	resultsIterator, err := ctx.GetStub().GetStateByRange(startKey, endKey)
+	query := fmt.Sprintf(`{"selector":{"type":"wallet"}}`)
+	resultsIterator, err := ctx.GetStub().GetQueryResult(query)
 
 	if err != nil {
 		return nil, err

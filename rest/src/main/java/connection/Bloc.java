@@ -83,7 +83,7 @@ public final class Bloc {
    * @param jsonString
    * @return
    */
-  public boolean addTrajectory(String jsonString) {
+  public boolean addTrajectory(String walletId, String jsonString) {
 
     // create a gateway connection
     try (Gateway gateway = bridge.getBuilder().connect()) {
@@ -94,7 +94,7 @@ public final class Bloc {
 
       // Transaction
       byte[] createResult = contract.createTransaction("AddTrajectory")
-        .submit(jsonString);
+        .submit(walletId, jsonString);
 
       System.out.println(" ############# Result ############## ");
       System.out.println(new String(createResult));

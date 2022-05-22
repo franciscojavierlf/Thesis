@@ -30,7 +30,7 @@ peer lifecycle chaincode queryinstalled
 # Package ID: ecotoken_1:632304e08c405194067d340681c0883304242271f6346c8cefe6de35c8f8cfc9, Label: ecotoken_1
 # Cambiar ID por el generado a cada uno
 
-export CC_PACKAGEID=a020c4730137504a6f757f6a8998dc9db9252a9a4042c7a06fa1fe39cd8b62ab
+export CC_PACKAGEID=08caf522ca9bc5d8ba02253e350a99d9cfb2585f3d044362861627fad52ad5a3
 
 # Peer 0 Org2
 CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/ngo1.org/users/Admin@ngo1.org/msp/
