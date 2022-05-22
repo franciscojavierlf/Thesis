@@ -30,7 +30,7 @@ class _State extends State<TrajectoryView> {
       await TrajectoriesBloc.addTrajectory(widget.trajectory);
       setState(() => loading = false);
     } catch (ex) {
-      print('Error adding trajectory');
+      print(ex);
       setState(() => loading = false);
     }
     goto(context, HubView(1), replace: true);
@@ -45,7 +45,8 @@ class _State extends State<TrajectoryView> {
         children: [
           ListTile(
             leading: TransportIcon(widget.trajectory.transport, size: 50),
-            title: EcoText.h3(widget.finished ? 'Recorrido terminado' : 'Recorrido'),
+            title: EcoText.h3(
+                widget.finished ? 'Recorrido terminado' : 'Recorrido'),
             subtitle: EcoText.p(widget.trajectory.finish.niceString),
           ),
           SizedBox(height: 20),
@@ -73,7 +74,8 @@ class _State extends State<TrajectoryView> {
                 direction: Axis.vertical,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  EcoText.h2(widget.trajectory.carbonEmitted.toStringAsFixed(2)),
+                  EcoText.h2(
+                      widget.trajectory.carbonEmitted.toStringAsFixed(2)),
                   EcoText.p(CO2),
                 ],
               ),
@@ -82,36 +84,45 @@ class _State extends State<TrajectoryView> {
           SizedBox(height: 25),
 
           // C02 saved
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              EcoText.h3('$CO2 ahorrado'),
-              Tooltip(
-                message:
-                    'Cantidad de $CO2 ahorrada si se hubiera usado un coche.',
-                triggerMode: TooltipTriggerMode.tap,
-                margin: EdgeInsets.symmetric(horizontal: screen.width * 0.15),
-                child: EcoText.h4(' (?)'),
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          // Car
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 25,
-            children: [
-              TransportIcon(Transport.Car),
-              EcoText.p('${widget.trajectory.carbonSaved.toStringAsFixed(2)}kg'),
-            ],
-          ).expanded,
+          if (!widget.finished)
+            Column(
+              children: [
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    EcoText.h3('$CO2 ahorrado'),
+                    Tooltip(
+                      message:
+                          'Cantidad de $CO2 ahorrada si se hubiera usado un coche.',
+                      triggerMode: TooltipTriggerMode.tap,
+                      margin:
+                          EdgeInsets.symmetric(horizontal: screen.width * 0.15),
+                      child: EcoText.h4(' (?)'),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                // Car
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 25,
+                  children: [
+                    TransportIcon(Transport.Car),
+                    EcoText.p(
+                        '${widget.trajectory.carbonSaved.toStringAsFixed(2)}kg'),
+                  ],
+                ).expanded,
 
-          // Bottom
-          EcoText.p(widget.finished ? 'Has generado' : 'Generaste').centered,
-          SizedBox(height: 10),
-          EcoText.pIcon(widget.trajectory.tokens.toStringAsFixed(8),
-              Image.asset('assets/images/logo.png', width: 30)),
-          SizedBox(height: 25),
+                // Bottom
+                EcoText.p(widget.finished ? 'Has generado' : 'Generaste')
+                    .centered,
+                SizedBox(height: 10),
+                EcoText.pIcon(widget.trajectory.tokens.toStringAsFixed(8),
+                    Image.asset('assets/images/logo.png', width: 30)),
+                SizedBox(height: 25),
+              ],
+            ),
+
           if (widget.finished)
             (loading
                 ? EcoText.h4('Cargando...')

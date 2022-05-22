@@ -16,24 +16,19 @@ abstract class RestConnection {
   }
 
   static get(String path) async {
-    print('$_url$path');
-    try {
     final res = await http.get(Uri.parse('$_url$path'));
     if (res.statusCode == 200)
       return jsonDecode(res.body);
     else
-      throw Exception('Failed to get path ' + path);
-    }
-    catch(ex) {
-      print(ex);
-    }
+      throw Exception('${res.statusCode}: ' + res.body);
   }
 
   static post(String path, Map<String, dynamic> data) async {
-    final res = await http.post(Uri.parse('$_url$path'), body: data);
-    if (res.statusCode == 200)
-      return res.body;
+    final res = await http.post(Uri.parse('$_url$path'), body: jsonEncode(data));
+    if (res.statusCode == 200) {
+      return jsonDecode(res.body);
+    }
     else
-      throw Exception('Failed to get path ' + path);
+      throw Exception('${res.statusCode}: ' + res.body);
   }
 }

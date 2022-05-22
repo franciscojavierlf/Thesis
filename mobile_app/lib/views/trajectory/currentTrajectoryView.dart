@@ -107,7 +107,8 @@ class _State extends State<CurrentTrajectoryView> {
   void finishTrajectory() async {
     // Saves trajectory
     try {
-      final trajectory = TrajectoriesBloc.generateTrajectory(
+      final trajectory = Trajectory.before(
+        finish: DateTime.now(),
         owner: profile,
         duration: Duration(milliseconds: duration),
         path: path,

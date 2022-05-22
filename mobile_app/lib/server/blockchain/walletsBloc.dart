@@ -1,37 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecotoken/logic/profile.dart';
 import 'package:ecotoken/logic/trajectory.dart';
 import 'package:ecotoken/logic/wallet.dart';
+import 'package:ecotoken/server/blockchain/restConnection.dart';
 import 'package:ecotoken/server/database/profilesBloc.dart';
 
 class WalletsBloc {
-  static final _db = FirebaseFirestore.instance;
   
   static Future<Wallet> getWallet(String walletId) async {
-    // FOR NOW, IT REACHES FIREBASE. IT SHOULD REACH THE BLOCKCHAIN.
-    final snapshot = await _db.collection('wallets').doc(walletId).get();
-    if (!snapshot.exists) throw 'Wallet with id $walletId does not exist.';
-    // Loads the profile
-    final owner = await ProfilesBloc.getProfile(snapshot.data()!['owner']);
-    if (owner == null)
-      throw 'Owner with id ${snapshot.data()!['owner']} was not found.';
-    return _walletfromMap(snapshot.id, owner, snapshot.data()!);
+    final Map<String, dynamic> res = await RestConnection.get('/wallets/${walletId}');
+    final owner = await ProfilesBloc.getProfile(walletId: walletId);
+    return _walletfromMap(walletId, owner!, res);
   }
 
   static Future<List<Wallet>> getWallets() async {
-    final snapshot =
-        await _db.collection('wallets').orderBy('carbonSaved').get();
+    // Gets all wallets
+    final List<dynamic> res = await RestConnection.get('/wallets');
     // Loads all the profiles
     final Map<String, Profile> profiles = {};
-    final futureProfiles = snapshot.docs
-        .map((doc) => ProfilesBloc.getProfile(doc.data()['owner']))
-        .toList();
+    final futureProfiles = res.map((wallet) =>
+      ProfilesBloc.getProfile(walletId: wallet['id'])
+    ).toList();
     (await Future.wait(futureProfiles)).forEach(
-        (profile) => profile != null ? profiles[profile.id] = profile : null);
+        (profile) => profile != null ? profiles[profile.walletId] = profile : null);
 
-    return snapshot.docs
-        .map((doc) =>
-            _walletfromMap(doc.id, profiles[doc.data()['owner']]!, doc.data()))
+    return res.map((wallet) =>
+      _walletfromMap(wallet['id'], profiles[wallet['id']]!, wallet))
         .toList();
   }
 
