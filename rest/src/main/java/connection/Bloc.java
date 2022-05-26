@@ -18,64 +18,42 @@ public final class Bloc {
     bridge.connect();
   }
 
-  public JsonArray queryAllWallets() {
-    byte[] result = null;
+  public JsonArray queryAllWallets() throws Exception {
     // create a gateway connection
-    try (Gateway gateway = bridge.getBuilder().connect()) {
-      // get the network and contract
-      Network network = gateway.getNetwork(bridge.channel);
-      Contract contract = network.getContract(bridge.contract);
-
-      result = contract.evaluateTransaction("QueryAllWallets");
-      JsonParser parser = new JsonParser();
-      JsonArray json = (JsonArray) parser.parse(new String(result));
-      return json;
-    }catch(Exception e) {
-      System.out.println(" ############# ERROR ############## ");
-      e.printStackTrace();
-      System.out.println(" ############# ERROR ############## ");
-    }
-    return new JsonArray();
+    Gateway gateway = bridge.getBuilder().connect();
+    // get the network and contract
+    Network network = gateway.getNetwork(bridge.channel);
+    Contract contract = network.getContract(bridge.contract);
+    byte[] result = contract.evaluateTransaction("QueryAllWallets");
+    JsonParser parser = new JsonParser();
+    JsonArray json = (JsonArray) parser.parse(new String(result));
+    return json;
   }
 
-  public JsonObject queryWallet(String walletId) {
-    byte[] result = null;
+  public JsonObject queryWallet(String walletId) throws Exception {
     // create a gateway connection
-    try (Gateway gateway = bridge.getBuilder().connect()) {
-      // get the network and contract
-      Network network = gateway.getNetwork(bridge.channel);
-      Contract contract = network.getContract(bridge.contract);
+    Gateway gateway = bridge.getBuilder().connect();
+    // get the network and contract
+    Network network = gateway.getNetwork(bridge.channel);
+    Contract contract = network.getContract(bridge.contract);
 
-      result = contract.evaluateTransaction("QueryWallet", walletId);
-      JsonParser parser = new JsonParser();
-      JsonObject json = (JsonObject) parser.parse(new String(result));
-      return json;
-    }catch(Exception e) {
-      System.out.println(" ############# ERROR ############## ");
-      e.printStackTrace();
-      System.out.println(" ############# ERROR ############## ");
-    }
-    return new JsonObject();
+    byte[] result = contract.evaluateTransaction("QueryWallet", walletId);
+    JsonParser parser = new JsonParser();
+    JsonObject json = (JsonObject) parser.parse(new String(result));
+    return json;
   }
 
-  public JsonArray queryTrajectories(String walletId) {
-    byte[] result = null;
+  public JsonArray queryTrajectories(String walletId) throws Exception {
     // create a gateway connection
-    try (Gateway gateway = bridge.getBuilder().connect()) {
-      // get the network and contract
-      Network network = gateway.getNetwork(bridge.channel);
-      Contract contract = network.getContract(bridge.contract);
+    Gateway gateway = bridge.getBuilder().connect();
+    // get the network and contract
+    Network network = gateway.getNetwork(bridge.channel);
+    Contract contract = network.getContract(bridge.contract);
 
-      result = contract.evaluateTransaction("QueryTrajectories", walletId);
-      JsonParser parser = new JsonParser();
-      JsonArray json = (JsonArray) parser.parse(new String(result));
-      return json;
-    }catch(Exception e) {
-      System.out.println(" ############# ERROR ############## ");
-      e.printStackTrace();
-      System.out.println(" ############# ERROR ############## ");
-    }
-    return new JsonArray();
+    byte[] result = contract.evaluateTransaction("QueryTrajectories", walletId);
+    JsonParser parser = new JsonParser();
+    JsonArray json = (JsonArray) parser.parse(new String(result));
+    return json;
   }
 
   /**
@@ -83,29 +61,19 @@ public final class Bloc {
    * @param jsonString
    * @return
    */
-  public boolean addTrajectory(String walletId, String jsonString) {
-
+  public JsonObject addTrajectory(String walletId, String jsonString) throws Exception {
     // create a gateway connection
-    try (Gateway gateway = bridge.getBuilder().connect()) {
+    Gateway gateway = bridge.getBuilder().connect();
 
-      // get the network and contract
-      Network network = gateway.getNetwork(bridge.channel);
-      Contract contract = network.getContract(bridge.contract);
+    // get the network and contract
+    Network network = gateway.getNetwork(bridge.channel);
+    Contract contract = network.getContract(bridge.contract);
 
-      // Transaction
-      byte[] createResult = contract.createTransaction("AddTrajectory")
-        .submit(walletId, jsonString);
-
-      System.out.println(" ############# Result ############## ");
-      System.out.println(new String(createResult));
-      System.out.println(" ############# Trajectory created ############## ");
-      return true;
-    } catch(Exception e) {
-      System.out.println(" ############# ERROR ############## ");
-      e.printStackTrace();
-      System.out.println(" ############# ERROR ############## ");
-    }
-
-    return false;
+    // Transaction
+    byte[] result = contract.createTransaction("AddTrajectory")
+      .submit(walletId, jsonString);
+    JsonParser parser = new JsonParser();
+    JsonObject json = (JsonObject) parser.parse(new String(result));
+    return json;
   }
 }

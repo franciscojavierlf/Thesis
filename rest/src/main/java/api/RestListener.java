@@ -1,10 +1,8 @@
 package api;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import connection.Bloc;
-import org.hyperledger.fabric.gateway.Contract;
-import org.hyperledger.fabric.gateway.Gateway;
-import org.hyperledger.fabric.gateway.Network;
 import spark.Spark;
 
 public final class RestListener {
@@ -19,24 +17,50 @@ public final class RestListener {
     bloc.connect();
 
     // Query all wallets
-    Spark.get("/wallets", (req, res) -> bloc.queryAllWallets());
+    Spark.get("/wallets", (req, res) -> {
+      try {
+        JsonArray json = bloc.queryAllWallets();
+        return json;
+      } catch(Exception ex) {
+        res.status(412);
+        return "{error:" + ex + "}";
+      }
+    });
 
     // Gets a single wallet
     Spark.get("/wallets/:walletId", (req, res) -> {
       String walletId = req.params(":walletId");
-      return bloc.queryWallet(walletId);
+      try {
+        JsonObject json = bloc.queryWallet(walletId);
+        return json;
+      } catch(Exception ex) {
+        res.status(412);
+        return "{error:" + ex + "}";
+      }
     });
 
     // Trajectories from a wallet
     Spark.get("/wallets/:walletId/trajectories", (req, res) -> {
       String walletId = req.params(":walletId");
-      return bloc.queryTrajectories(walletId);
+      try {
+        JsonArray json = bloc.queryTrajectories(walletId);
+        return json;
+      } catch(Exception ex) {
+        res.status(412);
+        return "{error:" + ex + "}";
+      }
     });
 
     // Creates a new trajectory
     Spark.post("/addTrajectory/:walletId", (req, res) -> {
       String walletId = req.params(":walletId");
-      return bloc.addTrajectory(walletId, req.body());
+      try {
+        JsonObject json = bloc.addTrajectory(walletId, req.body());
+        return json;
+      } catch(Exception ex) {
+        res.status(412);
+        return "{error:" + ex + "}";
+      }
     });
 
     // Wait for 10 seconds

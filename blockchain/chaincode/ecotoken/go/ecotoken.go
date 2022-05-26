@@ -80,18 +80,6 @@ type Wallet struct {
 	Type 										string `json:"type"`
 }
 
-// Structure used for handling result of a wallet's query
-type WalletQueryResult struct {
-	Key     string `json:"key"`
-	Record *Wallet
-}
-
-// Structure used for handling result of trajectory's query
-type TrajectoryQueryResult struct {
-	Key			string `json:"key"`
-	Record *Trajectory	
-}
-
 // InitLedger adds a base set of cars to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 
@@ -167,7 +155,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	return nil
 }
 
-func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterface, walletId string, jsonString string) error {
+func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterface, walletId string, jsonString string) (*Trajectory, error) {
 
 	id := uuid.New().String()
 
@@ -177,13 +165,13 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 
 	// Logic behind the incentive
 	if trajectoryData.Transport == "Transport.Car" {
-		return errors.New("Cannot add a trajectory with a car!")
+		return nil, errors.New("Cannot add a trajectory with a car!")
 	}
 	if !isTransportValid(trajectoryData.Transport) {
-		return errors.New("Transport is not valid: " + trajectoryData.Transport)
+		return nil, errors.New("Transport is not valid: " + trajectoryData.Transport)
 	}
 	if len(trajectoryData.Path) < 2 {
-		return errors.New("Path must contain at least two points!")
+		return nil, errors.New("Path must contain at least two points!")
 	}
 
 	// Calculates distance between two geopoints
@@ -240,7 +228,7 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 	// After adding trajectory, we add the update into the wallet
 	wallet, err := s.QueryWallet(ctx, walletId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	wallet.Tokens += tokens
@@ -250,7 +238,9 @@ func (s *SmartContract) AddTrajectory(ctx contractapi.TransactionContextInterfac
 	wallet.TotalTimeTravelled += trajectoryData.Duration
 
 	walletAsBytes, _ := json.Marshal(wallet)
-	return ctx.GetStub().PutState(walletId, walletAsBytes)
+	ctx.GetStub().PutState(walletId, walletAsBytes)
+
+	return &trajectory, nil
 }
 
 func (s *SmartContract) AddEmptyWallet(ctx contractapi.TransactionContextInterface, id string) error {
@@ -297,7 +287,7 @@ func (s *SmartContract) QueryWallet(ctx contractapi.TransactionContextInterface,
 }
 
 // Returns all trajectories from a wallet.
-func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInterface, walletId string) ([]TrajectoryQueryResult, error) {
+func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInterface, walletId string) ([]*Trajectory, error) {
 
 	// Creates a couchdb query
 	query := fmt.Sprintf(`{"selector":{"type":"trajectory","owner":"%s"}}`, walletId)
@@ -308,7 +298,7 @@ func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInte
 	}
 	defer resultsIterator.Close()
 
-	results := []TrajectoryQueryResult{}
+	results := []*Trajectory{}
 
 	for resultsIterator.HasNext() {
 		queryResponse, err := resultsIterator.Next()
@@ -320,15 +310,14 @@ func (s *SmartContract) QueryTrajectories(ctx contractapi.TransactionContextInte
 		trajectory := new(Trajectory)
 		_ = json.Unmarshal(queryResponse.Value, trajectory)
 
-		queryResult := TrajectoryQueryResult{Key: queryResponse.Key, Record: trajectory}
-		results = append(results, queryResult)
+		results = append(results, trajectory)
 	}
 
 	return results, nil
 }
 
 // Returns all wallets found in world state.
-func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterface) ([]WalletQueryResult, error) {
+func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterface) ([]*Wallet, error) {
 
 	query := fmt.Sprintf(`{"selector":{"type":"wallet"}}`)
 	resultsIterator, err := ctx.GetStub().GetQueryResult(query)
@@ -338,7 +327,7 @@ func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterf
 	}
 	defer resultsIterator.Close()
 
-	results := []WalletQueryResult{}
+	results := []*Wallet{}
 
 	for resultsIterator.HasNext() {
 		queryResponse, err := resultsIterator.Next()
@@ -349,9 +338,7 @@ func (s *SmartContract) QueryAllWallets(ctx contractapi.TransactionContextInterf
 
 		wallet := new(Wallet)
 		_ = json.Unmarshal(queryResponse.Value, wallet)
-
-		queryResult := WalletQueryResult{Key: queryResponse.Key, Record: wallet}
-		results = append(results, queryResult)
+		results = append(results, wallet)
 	}
 
 	return results, nil
