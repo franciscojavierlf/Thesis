@@ -4,11 +4,11 @@ class Profile {
   /// The name of the user.
   final String name;
   /// The wallet in the blockchain.
-  final String wallet;
+  final String walletId;
 
   Profile({
     required this.id,
     required this.name,
-    required this.wallet,
+    required this.walletId,
   });
 }

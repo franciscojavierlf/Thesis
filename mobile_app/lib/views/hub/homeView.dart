@@ -37,7 +37,7 @@ class _State extends State<HomeView> {
 
   void loadWallet() async {
     try {
-      WalletsBloc.getWallet(profile.wallet)
+      WalletsBloc.getWallet(profile.walletId)
           .then((value) => setState(() => wallet = value));
     } catch (ex) {
       print(error);

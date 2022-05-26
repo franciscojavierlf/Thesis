@@ -27,7 +27,7 @@ class _State extends State<TrajectoriesView> {
   }
 
   void loadTrajectories() {
-    TrajectoriesBloc.getTrajectories(owner: profile)
+    TrajectoriesBloc.getTrajectories(profile)
         .then((value) => setState(() => trajectories = value));
   }
 
